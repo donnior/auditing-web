@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI游戏集合 - 100% AI创作</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                }
+            }
+        }
+    </script>
+    <style>
+        .collapsible-content {
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        .collapsible-content.show {
+            display: block;
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-icon.rotated {
+            transform: rotate(90deg);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 p-6">
+    <div class="max-w-6xl mx-auto">
+        <div class="bg-white border border-gray-300 rounded-lg p-6 mb-6 shadow-sm">
+            <div class="text-xl font-semibold text-gray-800">题目： Python基础打印</div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="text-lg font-medium text-gray-700 mb-4">评估结果：</div>
+
+            <div id="gfx-result" class="bg-white border border-gray-300 rounded-lg shadow-sm">
+                <div class="flex justify-between mb-4 bg-gray-100 p-4">
+                    <span class="text-lg font-semibold text-gray-800" >规范性评估结果：</span>
+                </div>
+
+                <div id="gfx-rule-1" class="p-6 border-t border-gray-200  mb-4">
+                    <div class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">命名规范性</div>
+                    <div class="bg-gray-50 border border-gray-200 rounded-md p-4 mb-4 shadow-sm">
+                        <p class="text-gray-600 mb-2">xxxx</p>
+                        <p class="text-gray-600 mb-2">xxxx</p>
+                        <p class="text-gray-600">xxxx</p>
+                    </div>
+                    <div class="text-blue-600 hover:text-blue-800 cursor-pointer font-medium mb-3 flex items-center toggle-btn" data-target="detail-1">
+                        <span class="mr-2 toggle-icon">▶</span>
+                        查看详情（点击可展开）
+                    </div>
+                    <div class="collapsible-content" id="detail-1">
+                        <div class="bg-white border border-gray-200 rounded-md shadow-sm">
+                            <div class="flex justify-between bg-gray-50 p-4">
+                                <div>变量命名规范性</div>
+                                <div>3处</div>
+                            </div>
+                            <div class="p-2 bg-blue-50">
+                                <div class="p-4 bg-white mb-1">
+                                    <div class="px-2 py-1">第2行</div>
+                                    <div class="bg-gray-50 p-2"><code>print("Hello, World!")</code></div>
+                                </div>
+                                <div class="p-4 bg-white mb-1">
+                                    <div class="px-2 py-1">第3行</div>
+                                    <div class="bg-gray-50 p-2"><code>print("Hello, World!")</code></div>
+                                </div>
+                                <div class="p-4 bg-white mb-1">
+                                    <div class="px-2 py-1">第4行</div>
+                                    <div class="bg-gray-50 p-2"><code>print("Hello, World!")</code></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white border border-gray-200 rounded-md shadow-sm mt-4">
+                            <div class="flex justify-between bg-gray-50 p-4">
+                                <div>函数命名规范性</div>
+                                <div>2处</div>
+                            </div>
+                            <div class="p-2 bg-blue-50">
+                                <div class="p-4 bg-white mb-1">
+                                    <div class="px-2 py-1">第5行</div>
+                                    <div class="bg-gray-50 p-2"><code>print("Hello, World!")</code></div>
+                                </div>
+                                <div class="p-4 bg-white mb-1">
+                                    <div class="px-2 py-1">第6行</div>
+                                    <div class="bg-gray-50 p-2"><code>print("Hello, World!")</code></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="gfx-rule-2" class="p-6 border-t border-gray-200 mb-4">
+                    <div class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">魔法数字检查</div>
+                    <div class="bg-white border border-gray-200 rounded-md p-4 mb-4 shadow-sm">
+                        <p class="text-gray-600 mb-2">xxxx</p>
+                        <p class="text-gray-600 mb-2">xxxx</p>
+                        <p class="text-gray-600">xxxx</p>
+                    </div>
+                    <div class="text-blue-600 hover:text-blue-800 cursor-pointer font-medium mb-3 flex items-center toggle-btn" data-target="detail-2">
+                        <span class="mr-2 toggle-icon">▶</span>
+                        查看详情（点击可展开）
+                    </div>
+                    <div class="collapsible-content" id="detail-2">
+                        <div class="bg-white border border-gray-200 rounded-md shadow-sm">
+                            <div class="flex justify-between bg-gray-50 p-4">
+                                <div>魔法数字检查</div>
+                                <div>2处</div>
+                            </div>
+                            <div class="p-2 bg-blue-50">
+                                <div class="p-4 bg-white mb-1">
+                                    <div class="px-2 py-1">第2行</div>
+                                    <div class="bg-gray-50 p-2"><code>int a = 231;</code></div>
+                                </div>
+                                <div class="p-4 bg-white mb-1">
+                                    <div class="px-2 py-1">第3行</div>
+                                    <div class="bg-gray-50 p-2"><code>var a = "james"; </code></div>
+                                </div>
+                                <div class="p-4 bg-white mb-1">
+                                    <div class="px-2 py-1">第4行</div>
+                                    <div class="bg-gray-50 p-2"><code>const b = 123;</code></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="zqx-result" class="bg-white border border-gray-300 rounded-lg shadow-sm">
+                <div class="flex justify-between mb-4 bg-gray-100 p-4 border">
+                    <span class="text-lg font-semibold text-gray-800">正确性评估结果：</span>
+                </div>
+                <div id="zqx-rule-1" class="p-6 border-t border-gray-200 mb-4">
+                    <div class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">测试用例正确性</div>
+                    <div class="bg-white border border-gray-200 rounded-md p-4 shadow-sm">
+                        <p class="text-gray-600 mb-2">xxxx</p>
+                        <p class="text-gray-600 mb-2">xxxx</p>
+                        <p class="text-gray-600">xxxx</p>
+                    </div>
+
+                    <div class="text-blue-600 hover:text-blue-800 cursor-pointer font-medium mb-3 flex items-center toggle-btn" data-target="detail-3">
+                        <span class="mr-2 toggle-icon">▶</span>
+                        查看详情（点击可展开）
+                    </div>
+                    <div class="collapsible-content" id="detail-3">
+                        <div class="bg-white border border-gray-200 rounded-md shadow-sm">
+                            <div class="flex justify-between bg-gray-50 p-4">
+                                <div>测试用例</div>
+                                <div>通过率 <span class="text-green-500">8/10</span></div>
+                            </div>
+                            <div class="p-2 bg-blue-50">
+                                <div class="p-4 mb-2 bg-red-200 rounded-md">
+                                    <div class="px-2 py-1"><span class="font-bold mr-2">Input:</span> x=1</div>
+                                    <div class="px-2 py-1"><span class="font-bold mr-2">期望:</span> 1</div>
+                                    <div class="px-2 py-1"><span class="font-bold mr-2">实际:</span> 1</div>
+                                </div>
+                                <div class="p-4 mb-2 bg-green-200 rounded-md">
+                                    <div class="px-2 py-1"><span class="font-bold mr-2">Input:</span> x=2</div>
+                                    <div class="px-2 py-1"><span class="font-bold mr-2">期望:</span> 2</div>
+                                    <div class="px-2 py-1"><span class="font-bold mr-2">实际:</span> 2</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 为所有可折叠内容添加点击事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtns = document.querySelectorAll('.toggle-btn');
+
+            toggleBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const content = document.getElementById(targetId);
+                    const icon = this.querySelector('.toggle-icon');
+
+                    // 切换显示状态
+                    if (content.classList.contains('show')) {
+                        content.classList.remove('show');
+                        icon.classList.remove('rotated');
+                    } else {
+                        content.classList.add('show');
+                        icon.classList.add('rotated');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

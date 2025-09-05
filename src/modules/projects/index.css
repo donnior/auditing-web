@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+.project-list {
+    @apply grid grid-cols-3 gap-2 m-2;
+}
+
+.project-list-item {
+    @apply border border-gray-300 rounded-md p-2;
+}

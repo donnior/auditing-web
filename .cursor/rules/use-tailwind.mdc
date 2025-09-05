@@ -1,0 +1,7 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+
+做页面或者组件设计时候，样式上总是使用tailwind来实现

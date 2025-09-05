@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 20px auto;
+        }
+
+        td {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            font-size: 20px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        input[readonly] {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        /* 突出3x3子网格 */
+        tr:nth-child(3n) td {
+            border-bottom: 3px solid #000;
+        }
+
+        td:nth-child(3n) {
+            border-right: 3px solid #000;
+        }
+
+        #message {
+            margin-top: 10px;
+            font-size: 18px;
+            color: green;
+        }
+
+        button,
+        select {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Sudoku Game</h1>
+    <div>
+        <label for="difficulty">Difficulty:</label>
+        <select id="difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+        <button onclick="newGame()">New Game</button>
+    </div>
+    <table id="sudoku-grid"></table>
+    <div>
+        <button onclick="checkSolution()">Check Solution</button>
+        <button onclick="resetGrid()">Reset</button>
+    </div>
+    <div id="message"></div>
+
+    <script>
+        let currentPuzzle; // 当前谜题
+        let grid; // 存储输入元素
+
+        // 初始化网格
+        function initGrid(puzzle) {
+            const table = document.getElementById('sudoku-grid');
+            table.innerHTML = ''; // 清空
+            grid = [];
+
+            for (let i = 0; i < 9; i++) {
+                const row = table.insertRow();
+                grid[i] = [];
+                for (let j = 0; j < 9; j++) {
+                    const cell = row.insertCell();
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.maxLength = 1;
+                    input.value = puzzle[i][j] !== 0 ? puzzle[i][j] : '';
+                    if (puzzle[i][j] !== 0) {
+                        input.readOnly = true;
+                    }
+                    // 输入验证：只允许1-9
+                    input.addEventListener('input', (e) => {
+                        const val = e.target.value;
+                        if (!/^[1-9]$/.test(val)) {
+                            e.target.value = '';
+                        }
+                    });
+                    cell.appendChild(input);
+                    grid[i][j] = input;
+                }
+            }
+        }
+
+        // 开始新游戏：根据难度生成随机谜题
+        function newGame() {
+            const difficulty = document.getElementById('difficulty').value;
+            showMessage('Generating puzzle...', 'blue'); // 显示生成中
+            setTimeout(() => { // 异步以避免阻塞UI
+                currentPuzzle = generatePuzzle(difficulty);
+                initGrid(currentPuzzle);
+                document.getElementById('message').textContent = '';
+            }, 0);
+        }
+
+        // 重置网格到当前谜题初始状态
+        function resetGrid() {
+            initGrid(currentPuzzle);
+            document.getElementById('message').textContent = '';
+        }
+
+        // 生成随机数独谜题根据难度
+        function generatePuzzle(difficulty) {
+            // 先生成一个完整的随机解决方案
+            let fullGrid = generateFullSudoku();
+
+            // 根据难度确定要移除的数字数量
+            let removeCount;
+            switch (difficulty) {
+                case 'easy':
+                    removeCount = Math.floor(Math.random() * 11) + 25; // 25-35
+                    break;
+                case 'medium':
+                    removeCount = Math.floor(Math.random() * 11) + 40; // 40-50
+                    break;
+                case 'hard':
+                    removeCount = Math.floor(Math.random() * 11) + 50; // 50-60
+                    break;
+            }
+
+            // 随机移除数字
+            let positions = [];
+            for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                    positions.push([i, j]);
+                }
+            }
+            // 打乱位置
+            positions = positions.sort(() => Math.random() - 0.5);
+            // 移除前removeCount个位置的数字
+            for (let k = 0; k < removeCount; k++) {
+                const [i, j] = positions[k];
+                fullGrid[i][j] = 0;
+            }
+
+            return fullGrid.map(row => row.slice());
+        }
+
+        // 生成一个完整的随机数独解决方案（使用回溯）
+        function generateFullSudoku() {
+            let sudoku = Array.from({ length: 9 }, () => Array(9).fill(0));
+
+            // 辅助函数：检查是否可以放置数字
+            function isSafe(row, col, num) {
+                // 检查行
+                for (let j = 0; j < 9; j++) {
+                    if (sudoku[row][j] === num) return false;
+                }
+                // 检查列
+                for (let i = 0; i < 9; i++) {
+                    if (sudoku[i][col] === num) return false;
+                }
+                // 检查3x3块
+                const startRow = Math.floor(row / 3) * 3;
+                const startCol = Math.floor(col / 3) * 3;
+                for (let i = 0; i < 3; i++) {
+                    for (let j = 0; j < 3; j++) {
+                        if (sudoku[startRow + i][startCol + j] === num) return false;
+                    }
+                }
+                return true;
+            }
+
+            // 回溯填充网格
+            function solve(cell = 0) {
+                if (cell === 81) return true; // 所有单元格已填充
+
+                const row = Math.floor(cell / 9);
+                const col = cell % 9;
+
+                // 如果已填充，跳过
+                if (sudoku[row][col] !== 0) return solve(cell + 1);
+
+                // 尝试1-9（随机顺序以增加随机性）
+                let nums = [1, 2, 3, 4, 5, 6, 7, 8, 9].sort(() => Math.random() - 0.5);
+                for (let num of nums) {
+                    if (isSafe(row, col, num)) {
+                        sudoku[row][col] = num;
+                        if (solve(cell + 1)) return true;
+                        sudoku[row][col] = 0; // 回溯
+                    }
+                }
+                return false;
+            }
+
+            solve(); // 开始填充
+            return sudoku;
+        }
+
+        // 检查解决方案
+        function checkSolution() {
+            const currentGrid = getCurrentGrid();
+            if (!isComplete(currentGrid)) {
+                showMessage('The grid is not complete!', 'red');
+                return;
+            }
+            if (validateSudoku(currentGrid)) {
+                showMessage('Congratulations! Solution is correct!', 'green');
+            } else {
+                showMessage('Solution is incorrect. Try again!', 'red');
+            }
+        }
+
+        // 获取当前网格值（转换为数字，空为0）
+        function getCurrentGrid() {
+            const current = [];
+            for (let i = 0; i < 9; i++) {
+                current[i] = [];
+                for (let j = 0; j < 9; j++) {
+                    const val = grid[i][j].value;
+                    current[i][j] = val ? parseInt(val) : 0;
+                }
+            }
+            return current;
+        }
+
+        // 检查是否所有单元格都已填充
+        function isComplete(grid) {
+            for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                    if (grid[i][j] === 0) return false;
+                }
+            }
+            return true;
+        }
+
+        // 验证数独：检查行、列、3x3块
+        function validateSudoku(grid) {
+            // 检查行
+            for (let i = 0; i < 9; i++) {
+                if (!isUnique(grid[i])) return false;
+            }
+
+            // 检查列
+            for (let j = 0; j < 9; j++) {
+                const col = [];
+                for (let i = 0; i < 9; i++) {
+                    col.push(grid[i][j]);
+                }
+                if (!isUnique(col)) return false;
+            }
+
+            // 检查3x3块
+            for (let blockRow = 0; blockRow < 3; blockRow++) {
+                for (let blockCol = 0; blockCol < 3; blockCol++) {
+                    const block = [];
+                    for (let i = 0; i < 3; i++) {
+                        for (let j = 0; j < 3; j++) {
+                            block.push(grid[blockRow * 3 + i][blockCol * 3 + j]);
+                        }
+                    }
+                    if (!isUnique(block)) return false;
+                }
+            }
+
+            return true;
+        }
+
+        // 检查数组是否包含唯一的1-9（无重复，无0）
+        function isUnique(arr) {
+            const set = new Set();
+            for (let num of arr) {
+                if (num === 0 || set.has(num)) return false;
+                set.add(num);
+            }
+            return set.size === 9;
+        }
+
+        // 显示消息
+        function showMessage(text, color) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.style.color = color;
+        }
+
+        // 页面加载时初始化默认谜题（Medium）
+        window.onload = function () {
+            currentPuzzle = generatePuzzle('medium');
+            initGrid(currentPuzzle);
+        };
+    </script>
+</body>
+
+</html>
