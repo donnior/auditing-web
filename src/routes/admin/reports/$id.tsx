@@ -43,6 +43,52 @@ function RouteComponent() {
     }
   }
 
+  const getGenerationStatusDisplay = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return {
+          text: '已完成',
+          color: 'bg-green-100 text-green-800',
+          icon: (
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          )
+        }
+      case 'generating':
+        return {
+          text: '生成中',
+          color: 'bg-blue-100 text-blue-800',
+          icon: (
+            <svg className="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          )
+        }
+      case 'failed':
+        return {
+          text: '生成失败',
+          color: 'bg-red-100 text-red-800',
+          icon: (
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          )
+        }
+      default:
+        return {
+          text: '未知',
+          color: 'bg-gray-100 text-gray-800',
+          icon: null
+        }
+    }
+  }
+
+  const isReportCompleted = report.generationStatus === 'completed'
+  const isReportGenerating = report.generationStatus === 'generating'
+  const isReportFailed = report.generationStatus === 'failed'
+
   const getScoreColor = (score: number, maxScore: number = 10) => {
     const percentage = (score / maxScore) * 100
     if (percentage >= 80) return 'text-green-600'
@@ -74,9 +120,19 @@ function RouteComponent() {
             <h2 className="text-xl font-semibold text-gray-900 mb-2">{report.qwAccountName} 的工作报告【2025/09/01】</h2>
             <p className="text-gray-600">账号ID: {report.qwAccountId}</p>
           </div>
-          <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getPerformanceColor(report.performanceRating)}`}>
-            {report.performanceRating}
-          </span>
+          <div className="flex items-center gap-3">
+            {/* 生成状态 */}
+            <span className={`inline-flex items-center px-3 py-1 text-sm font-semibold rounded-full ${getGenerationStatusDisplay(report.generationStatus).color}`}>
+              {getGenerationStatusDisplay(report.generationStatus).icon}
+              {getGenerationStatusDisplay(report.generationStatus).text}
+            </span>
+            {/* 只有已完成的报告才显示绩效评级 */}
+            {isReportCompleted && (
+              <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getPerformanceColor(report.performanceRating)}`}>
+                {report.performanceRating}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -99,7 +155,19 @@ function RouteComponent() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">服务客户数</p>
-              <p className="text-2xl font-bold text-gray-900">{report.totalCustomers}</p>
+              {isReportCompleted ? (
+                <p className="text-2xl font-bold text-gray-900">{report.totalCustomers}</p>
+              ) : isReportFailed ? (
+                <div className="flex items-center">
+                  <span className="text-xl font-bold text-red-500">--</span>
+                  <span className="ml-2 text-sm text-red-500">生成失败</span>
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
+                  <span className="ml-2 text-sm text-gray-500">分析中...</span>
+                </div>
+              )}
             </div>
             <div className="p-3 bg-blue-100 rounded-full">
               <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -113,7 +181,19 @@ function RouteComponent() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">消息总数</p>
-              <p className="text-2xl font-bold text-gray-900">{report.totalMessages}</p>
+              {isReportCompleted ? (
+                <p className="text-2xl font-bold text-gray-900">{report.totalMessages}</p>
+              ) : isReportFailed ? (
+                <div className="flex items-center">
+                  <span className="text-xl font-bold text-red-500">--</span>
+                  <span className="ml-2 text-sm text-red-500">生成失败</span>
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
+                  <span className="ml-2 text-sm text-gray-500">分析中...</span>
+                </div>
+              )}
             </div>
             <div className="p-3 bg-green-100 rounded-full">
               <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -127,7 +207,19 @@ function RouteComponent() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">平均响应时间</p>
-              <p className="text-2xl font-bold text-gray-900">{report.avgResponseTime}分钟</p>
+              {isReportCompleted ? (
+                <p className="text-2xl font-bold text-gray-900">{report.avgResponseTime}分钟</p>
+              ) : isReportFailed ? (
+                <div className="flex items-center">
+                  <span className="text-xl font-bold text-red-500">--</span>
+                  <span className="ml-2 text-sm text-red-500">生成失败</span>
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
+                  <span className="ml-2 text-sm text-gray-500">分析中...</span>
+                </div>
+              )}
             </div>
             <div className="p-3 bg-yellow-100 rounded-full">
               <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,7 +233,19 @@ function RouteComponent() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">违规次数</p>
-              <p className="text-2xl font-bold text-red-600">{report.totalViolations}</p>
+              {isReportCompleted ? (
+                <p className="text-2xl font-bold text-red-600">{report.totalViolations}</p>
+              ) : isReportFailed ? (
+                <div className="flex items-center">
+                  <span className="text-xl font-bold text-red-500">--</span>
+                  <span className="ml-2 text-sm text-red-500">生成失败</span>
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
+                  <span className="ml-2 text-sm text-gray-500">分析中...</span>
+                </div>
+              )}
             </div>
             <div className="p-3 bg-red-100 rounded-full">
               <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,60 +260,148 @@ function RouteComponent() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">客户满意度</h3>
-          <div className="flex items-center gap-4">
-            <div className="flex-1">
-              <div className="flex justify-between text-sm text-gray-600 mb-2">
-                <span>1.0</span>
-                <span>5.0</span>
+          {isReportCompleted ? (
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <div className="flex justify-between text-sm text-gray-600 mb-2">
+                  <span>1.0</span>
+                  <span>5.0</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-blue-600 h-2 rounded-full"
+                    style={{ width: `${(report.overallSatisfaction / 5) * 100}%` }}
+                  ></div>
+                </div>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-blue-600 h-2 rounded-full"
-                  style={{ width: `${(report.overallSatisfaction / 5) * 100}%` }}
-                ></div>
+              <span className={`text-2xl font-bold ${getScoreColor(report.overallSatisfaction, 5)}`}>
+                {report.overallSatisfaction}
+              </span>
+            </div>
+          ) : isReportFailed ? (
+            <div className="flex items-center justify-center h-16">
+              <div className="text-center">
+                <svg className="w-8 h-8 mx-auto text-red-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <p className="text-red-500 text-sm">生成失败</p>
               </div>
             </div>
-            <span className={`text-2xl font-bold ${getScoreColor(report.overallSatisfaction, 5)}`}>
-              {report.overallSatisfaction}
-            </span>
-          </div>
+          ) : (
+            <div className="flex items-center justify-center h-16">
+              <div className="animate-pulse bg-gray-200 h-4 w-full rounded"></div>
+              <span className="ml-4 text-sm text-gray-500">分析中...</span>
+            </div>
+          )}
         </div>
 
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">服务质量评分</h3>
-          <div className="flex items-center gap-4">
-            <div className="flex-1">
-              <div className="flex justify-between text-sm text-gray-600 mb-2">
-                <span>0</span>
-                <span>10</span>
+          {isReportCompleted ? (
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <div className="flex justify-between text-sm text-gray-600 mb-2">
+                  <span>0</span>
+                  <span>10</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-green-600 h-2 rounded-full"
+                    style={{ width: `${(report.serviceQualityScore / 10) * 100}%` }}
+                  ></div>
+                </div>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-green-600 h-2 rounded-full"
-                  style={{ width: `${(report.serviceQualityScore / 10) * 100}%` }}
-                ></div>
+              <span className={`text-2xl font-bold ${getScoreColor(report.serviceQualityScore, 10)}`}>
+                {report.serviceQualityScore}
+              </span>
+            </div>
+          ) : isReportFailed ? (
+            <div className="flex items-center justify-center h-16">
+              <div className="text-center">
+                <svg className="w-8 h-8 mx-auto text-red-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <p className="text-red-500 text-sm">生成失败</p>
               </div>
             </div>
-            <span className={`text-2xl font-bold ${getScoreColor(report.serviceQualityScore, 10)}`}>
-              {report.serviceQualityScore}
-            </span>
-          </div>
+          ) : (
+            <div className="flex items-center justify-center h-16">
+              <div className="animate-pulse bg-gray-200 h-4 w-full rounded"></div>
+              <span className="ml-4 text-sm text-gray-500">分析中...</span>
+            </div>
+          )}
         </div>
       </div>
 
       {/* 报告摘要 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">报告摘要</h3>
-        <p className="text-gray-700 leading-relaxed">{report.reportSummary}</p>
-      </div>
+      {isReportCompleted ? (
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">报告摘要</h3>
+          <p className="text-gray-700 leading-relaxed">{report.reportSummary}</p>
+        </div>
+      ) : isReportFailed ? (
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">报告摘要</h3>
+          <div className="flex items-center justify-center h-24 bg-red-50 rounded-lg border-2 border-red-100">
+            <div className="text-center">
+              <svg className="w-8 h-8 mx-auto text-red-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+              <p className="text-red-600 text-sm font-medium">报告生成失败</p>
+              <p className="text-red-500 text-xs mt-1">请联系技术支持或重新生成</p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">报告摘要</h3>
+          <div className="flex items-center justify-center h-24 bg-gray-50 rounded-lg">
+            <div className="text-center">
+              <svg className="w-8 h-8 mx-auto text-gray-400 mb-2 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 818-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p className="text-gray-500 text-sm">正在生成报告摘要...</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 改进建议 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">改进建议</h3>
-        <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
-          <p className="text-gray-700 leading-relaxed">{report.improvementSuggestions}</p>
+      {isReportCompleted ? (
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">改进建议</h3>
+          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+            <p className="text-gray-700 leading-relaxed">{report.improvementSuggestions}</p>
+          </div>
         </div>
-      </div>
+      ) : isReportFailed ? (
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">改进建议</h3>
+          <div className="flex items-center justify-center h-24 bg-red-50 rounded-lg border-2 border-red-100">
+            <div className="text-center">
+              <svg className="w-8 h-8 mx-auto text-red-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+              <p className="text-red-600 text-sm font-medium">改进建议生成失败</p>
+              <p className="text-red-500 text-xs mt-1">请联系技术支持或重新生成</p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">改进建议</h3>
+          <div className="flex items-center justify-center h-24 bg-gray-50 rounded-lg">
+            <div className="text-center">
+              <svg className="w-8 h-8 mx-auto text-gray-400 mb-2 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 818-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p className="text-gray-500 text-sm">正在生成改进建议...</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className='mb-4'></div>
 

@@ -16,6 +16,7 @@ export const mockReports: Report[] = [
     serviceQualityScore: 8.7,
     performanceRating: '优秀',
     improvementSuggestions: '建议加强产品知识培训，提高复杂问题处理速度；优化标准化回复模板，提升工作效率；加强情绪管理培训，更好地处理投诉客户。',
+    generationStatus: 'completed',
     createdAt: '2024-02-01T10:00:00Z',
     updatedAt: '2024-02-01T10:00:00Z'
   },
@@ -34,6 +35,7 @@ export const mockReports: Report[] = [
     serviceQualityScore: 8.2,
     performanceRating: '良好',
     improvementSuggestions: '建议加强技术类问题的学习和培训；优化沟通技巧，减少客户等待时间；建立个人知识库，提高问题解决效率。',
+    generationStatus: 'generating',
     createdAt: '2024-02-01T11:00:00Z',
     updatedAt: '2024-02-01T11:00:00Z'
   },
@@ -52,15 +54,47 @@ export const mockReports: Report[] = [
     serviceQualityScore: 7.5,
     performanceRating: '合格',
     improvementSuggestions: '继续加强业务培训，提高专业技能；建立导师制，加强一对一指导；多参与团队分享，学习优秀经验；提高工作效率和准确性。',
+    generationStatus: 'completed',
     createdAt: '2024-02-01T12:00:00Z',
     updatedAt: '2024-02-01T12:00:00Z'
+  },
+  {
+    id: '4',
+    qwAccountId: 'QW004',
+    qwAccountName: '赵六',
+    cycleStartTime: '2024-01-01T00:00:00Z',
+    cycleEndTime: '2024-01-31T23:59:59Z',
+    reportSummary: '报告生成过程中遇到了技术问题，数据分析失败。',
+    totalCustomers: 0,
+    totalMessages: 0,
+    avgResponseTime: 0,
+    overallSatisfaction: 0,
+    totalViolations: 0,
+    serviceQualityScore: 0,
+    performanceRating: '无法评定',
+    improvementSuggestions: '请联系技术支持重新生成报告。',
+    generationStatus: 'failed',
+    createdAt: '2024-02-01T13:00:00Z',
+    updatedAt: '2024-02-01T13:00:00Z'
   }
 ]
 
 export const getReportById = async (id: string): Promise<Report | undefined> => {
   // 模拟网络延时
-  await new Promise(resolve => setTimeout(resolve, 1000))
+  await new Promise(resolve => setTimeout(resolve, 200))
   return mockReports.find(report => report.id === id)
+}
+
+// 获取所有报告，支持按员工姓名过滤
+export const getReports = async (staffName?: string): Promise<Report[]> => {
+  // 模拟网络延时
+  await new Promise(resolve => setTimeout(resolve, 300))
+
+  if (staffName) {
+    return mockReports.filter(report => report.qwAccountName === staffName)
+  }
+
+  return mockReports
 }
 
 // 客户报告Mock数据

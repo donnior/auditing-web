@@ -44,6 +44,7 @@ export interface Report {
   serviceQualityScore: number
   performanceRating: string
   improvementSuggestions: string
+  generationStatus: 'generating' | 'completed' | 'failed'
   createdAt: string
   updatedAt: string
 }

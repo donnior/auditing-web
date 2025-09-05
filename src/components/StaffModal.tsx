@@ -1,18 +1,23 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import type { CreateStaffData } from '@/api/staffs'
+import type { Staff } from '@/api/types'
 
 interface StaffModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (data: CreateStaffData) => Promise<void>
   isLoading?: boolean
+  editingStaff?: Staff | null // 编辑模式时传入的员工数据
+  mode?: 'create' | 'edit' // 模式：创建或编辑
 }
 
 export const StaffModal: React.FC<StaffModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
-  isLoading = false
+  isLoading = false,
+  editingStaff = null,
+  mode = 'create'
 }) => {
   const [formData, setFormData] = useState<CreateStaffData>({
     name: '',
@@ -21,6 +26,25 @@ export const StaffModal: React.FC<StaffModalProps> = ({
   })
 
   const [errors, setErrors] = useState<Partial<CreateStaffData>>({})
+
+  // 当编辑模式时，填充表单数据
+  useEffect(() => {
+    if (mode === 'edit' && editingStaff) {
+      setFormData({
+        name: editingStaff.name,
+        qwAccountId: editingStaff.qwAccountId,
+        autoGenerateReport: editingStaff.autoGenerateReport
+      })
+    } else {
+      // 创建模式时重置表单
+      setFormData({
+        name: '',
+        qwAccountId: '',
+        autoGenerateReport: false
+      })
+    }
+    setErrors({})
+  }, [mode, editingStaff, isOpen])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -80,7 +104,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
           {/* Modal 头部 */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <h3 className="text-lg font-medium text-gray-900">
-              新增员工
+              {mode === 'edit' ? '编辑员工' : '新增员工'}
             </h3>
             <button
               type="button"
@@ -165,7 +189,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
                 disabled={isLoading}
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? '创建中...' : '创建'}
+                {isLoading ? (mode === 'edit' ? '更新中...' : '创建中...') : (mode === 'edit' ? '更新' : '创建')}
               </button>
             </div>
           </form>

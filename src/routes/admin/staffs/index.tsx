@@ -1,8 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
-import { useStaffs, useCreateStaff, useDeleteStaff } from '@/hooks/useStaffs'
+import { useStaffs, useCreateStaff, useUpdateStaff, useDeleteStaff } from '@/hooks/useStaffs'
 import { StaffModal } from '@/components/StaffModal'
 import type { CreateStaffData } from '@/api/staffs'
+import type { Staff } from '@/api/types'
 
 export const Route = createFileRoute('/admin/staffs/')({
   component: RouteComponent,
@@ -11,11 +12,36 @@ export const Route = createFileRoute('/admin/staffs/')({
 function RouteComponent() {
   const { staffs, isLoading, refetch } = useStaffs()
   const { createStaffMutation, isCreating } = useCreateStaff()
+  const { updateStaffMutation, isUpdating } = useUpdateStaff()
   const { deleteStaffMutation, isDeleting } = useDeleteStaff()
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingStaff, setEditingStaff] = useState<Staff | null>(null)
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
 
-  const handleCreateStaff = async (data: CreateStaffData) => {
-    await createStaffMutation(data)
+  const handleSubmitStaff = async (data: CreateStaffData) => {
+    if (modalMode === 'edit' && editingStaff) {
+      await updateStaffMutation({ id: editingStaff.id, data })
+    } else {
+      await createStaffMutation(data)
+    }
+  }
+
+  const handleEditStaff = (staff: Staff) => {
+    setEditingStaff(staff)
+    setModalMode('edit')
+    setIsModalOpen(true)
+  }
+
+  const handleCreateStaff = () => {
+    setEditingStaff(null)
+    setModalMode('create')
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setEditingStaff(null)
+    setModalMode('create')
   }
 
   const handleDeleteStaff = async (id: string, name: string) => {
@@ -37,8 +63,8 @@ function RouteComponent() {
       {/* 页面头部 */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">员工管理</h1>
-        <button
-          onClick={() => setIsModalOpen(true)}
+                <button
+          onClick={handleCreateStaff}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -113,18 +139,25 @@ function RouteComponent() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center gap-2">
+                      <Link
+                        to="/admin/reports"
+                        search={{ staff: staff.name }}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        查看报告
+                      </Link>
+                      <button
+                        onClick={() => handleEditStaff(staff)}
+                        className="text-green-600 hover:text-green-800"
+                      >
+                        编辑
+                      </button>
                       <button
                         onClick={() => handleDeleteStaff(staff.id, staff.name)}
                         disabled={isDeleting}
                         className="text-red-600 hover:text-red-800 disabled:opacity-50"
                       >
                         删除
-                      </button>
-                      <button
-                        onClick={}
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                         查看他的报告
                       </button>
                     </div>
                   </td>
@@ -142,12 +175,14 @@ function RouteComponent() {
         </div>
       </div>
 
-      {/* 新增员工 Modal */}
+      {/* 员工 Modal */}
       <StaffModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleCreateStaff}
-        isLoading={isCreating}
+        onClose={handleCloseModal}
+        onSubmit={handleSubmitStaff}
+        isLoading={modalMode === 'edit' ? isUpdating : isCreating}
+        editingStaff={editingStaff}
+        mode={modalMode}
       />
     </div>
   )
