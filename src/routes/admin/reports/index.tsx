@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { z } from 'zod'
 import { useQuery } from '@tanstack/react-query'
 import { getReports } from '@/api/mock/reports'
+import { formatDate } from '@/lib/utils'
 
 const searchSchema = z.object({
   staff: z.string().optional(),
@@ -24,12 +25,12 @@ function RouteComponent() {
   // 转换数据格式以适配现有的UI
   const reports = data.map(report => ({
     id: report.id,
-    title: `【${new Date(report.cycleStartTime).toLocaleDateString('zh-CN')}】${report.qwAccountName}`,
+    title: `【${formatDate(report.cycleStartTime)}】${report.qwAccountName}`,
     staff: report.qwAccountName,
-    period: new Date(report.cycleStartTime).toLocaleDateString('zh-CN'),
+    period: formatDate(report.cycleStartTime),
     status: report.totalViolations > 3 ? '违规' : '正常',
     generationStatus: report.generationStatus,
-    createdAt: new Date(report.createdAt).toLocaleDateString('zh-CN'),
+    createdAt: formatDate(report.createdAt),
     views: Math.floor(Math.random() * 2000) + 500 // 随机生成浏览量
   }))
 

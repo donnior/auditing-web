@@ -26,8 +26,8 @@ function RouteComponent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 px-4">
-      <div className="max-w-md w-full space-y-8">
+    <div className=" flex items-center justify-center  from-gray-50 to-gray-100 px-4">
+      <div className="max-w-1/2 w-full space-y-8">
         {/* 登录表单容器 */}
         <div className="bg-white rounded-xl shadow-2xl p-8 border border-gray-200">
           {/* 头部标题 */}
@@ -99,8 +99,8 @@ function RouteComponent() {
             </button>
           </form>
 
-          {/* 分割线 */}
-          <div className="mt-6">
+
+          {/* <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300"></div>
@@ -111,12 +111,11 @@ function RouteComponent() {
             </div>
           </div>
 
-          {/* 第三方登录选项 */}
           <div className="mt-6 space-y-3">
             <button className="w-full bg-gray-50 hover:bg-gray-100 text-gray-900 font-medium py-2 px-4 rounded-lg border border-gray-300 transition-all duration-200 flex items-center justify-center space-x-2">
               <span>使用 Feishu 登录</span>
             </button>
-          </div>
+          </div> */}
 
           {/* 注册链接 */}
           <div className="mt-6 text-center">
