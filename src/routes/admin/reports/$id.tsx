@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { getReportById, getCustomerReportsByAccountId } from '../../../api/mock/reports'
+import { getReportById, getCustomerReportsByAccountId } from '@/api/reports'
 import { getChatSession } from '../../../api/mock/chats'
-import type { Report, CustomerReport } from '../../../api/types'
+import type { Report, CustomerReport } from '@/api/types'
 
 export const Route = createFileRoute('/admin/reports/$id')({
   loader: async ({ params }) => {
@@ -10,7 +10,7 @@ export const Route = createFileRoute('/admin/reports/$id')({
     if (!report) {
       throw new Error(`Report with id ${id} not found`)
     }
-    const customerReports = getCustomerReportsByAccountId(report.qwAccountId)
+    const customerReports = await getCustomerReportsByAccountId(report.qw_account_id, report.cycle_start_time, report.cycle_end_time)
     return {
       report,
       customerReports
@@ -21,6 +21,8 @@ export const Route = createFileRoute('/admin/reports/$id')({
 
 function RouteComponent() {
   const { report, customerReports } = Route.useLoaderData()
+  console.log('report', report)
+  console.log('customerReports', customerReports)
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('zh-CN', {
@@ -85,9 +87,9 @@ function RouteComponent() {
     }
   }
 
-  const isReportCompleted = report.generationStatus === 'completed'
-  const isReportGenerating = report.generationStatus === 'generating'
-  const isReportFailed = report.generationStatus === 'failed'
+  const isReportCompleted = report.generation_status === 'completed' || true
+  const isReportGenerating = report.generation_status === 'generating'
+  const isReportFailed = report.generation_status === 'failed'
 
   const getScoreColor = (score: number, maxScore: number = 10) => {
     const percentage = (score / maxScore) * 100
@@ -117,19 +119,19 @@ function RouteComponent() {
       <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">{report.qwAccountName} 的工作报告【2025/09/01】</h2>
-            <p className="text-gray-600">账号ID: {report.qwAccountId}</p>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">{report.qw_account_name} 的工作报告【2025/09/01】</h2>
+            <p className="text-gray-600">账号ID: {report.qw_account_id}</p>
           </div>
           <div className="flex items-center gap-3">
             {/* 生成状态 */}
-            <span className={`inline-flex items-center px-3 py-1 text-sm font-semibold rounded-full ${getGenerationStatusDisplay(report.generationStatus).color}`}>
-              {getGenerationStatusDisplay(report.generationStatus).icon}
-              {getGenerationStatusDisplay(report.generationStatus).text}
+            <span className={`inline-flex items-center px-3 py-1 text-sm font-semibold rounded-full ${getGenerationStatusDisplay(report.generation_status).color}`}>
+              {getGenerationStatusDisplay(report.generation_status).icon}
+              {getGenerationStatusDisplay(report.generation_status).text}
             </span>
             {/* 只有已完成的报告才显示绩效评级 */}
             {isReportCompleted && (
-              <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getPerformanceColor(report.performanceRating)}`}>
-                {report.performanceRating}
+              <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getPerformanceColor(report.performance_rating)}`}>
+                {report.performance_rating}
               </span>
             )}
           </div>
@@ -144,7 +146,7 @@ function RouteComponent() {
           </div> */}
           <div>
             <span className="text-gray-600">生成时间:</span>
-            <span className="ml-2 font-medium">{formatDate(report.createdAt)}</span>
+            <span className="ml-2 font-medium">{formatDate(report.create_time)}</span>
           </div>
         </div>
       </div>
@@ -156,7 +158,7 @@ function RouteComponent() {
             <div>
               <p className="text-sm font-medium text-gray-600">服务客户数</p>
               {isReportCompleted ? (
-                <p className="text-2xl font-bold text-gray-900">{report.totalCustomers}</p>
+                <p className="text-2xl font-bold text-gray-900">{report.total_customers}</p>
               ) : isReportFailed ? (
                 <div className="flex items-center">
                   <span className="text-xl font-bold text-red-500">--</span>
@@ -182,7 +184,7 @@ function RouteComponent() {
             <div>
               <p className="text-sm font-medium text-gray-600">消息总数</p>
               {isReportCompleted ? (
-                <p className="text-2xl font-bold text-gray-900">{report.totalMessages}</p>
+                <p className="text-2xl font-bold text-gray-900">{report.total_messages}</p>
               ) : isReportFailed ? (
                 <div className="flex items-center">
                   <span className="text-xl font-bold text-red-500">--</span>
@@ -208,7 +210,7 @@ function RouteComponent() {
             <div>
               <p className="text-sm font-medium text-gray-600">平均响应时间</p>
               {isReportCompleted ? (
-                <p className="text-2xl font-bold text-gray-900">{report.avgResponseTime}分钟</p>
+                <p className="text-2xl font-bold text-gray-900">{report.avg_response_time}分钟</p>
               ) : isReportFailed ? (
                 <div className="flex items-center">
                   <span className="text-xl font-bold text-red-500">--</span>
@@ -234,7 +236,7 @@ function RouteComponent() {
             <div>
               <p className="text-sm font-medium text-gray-600">违规次数</p>
               {isReportCompleted ? (
-                <p className="text-2xl font-bold text-red-600">{report.totalViolations}</p>
+                <p className="text-2xl font-bold text-red-600">{report.total_violations}</p>
               ) : isReportFailed ? (
                 <div className="flex items-center">
                   <span className="text-xl font-bold text-red-500">--</span>
@@ -270,12 +272,12 @@ function RouteComponent() {
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-blue-600 h-2 rounded-full"
-                    style={{ width: `${(report.overallSatisfaction / 5) * 100}%` }}
+                    style={{ width: `${(report.overall_satisfaction / 5) * 100}%` }}
                   ></div>
                 </div>
               </div>
-              <span className={`text-2xl font-bold ${getScoreColor(report.overallSatisfaction, 5)}`}>
-                {report.overallSatisfaction}
+              <span className={`text-2xl font-bold ${getScoreColor(report.overall_satisfaction, 5)}`}>
+                {report.overall_satisfaction}
               </span>
             </div>
           ) : isReportFailed ? (
@@ -307,12 +309,12 @@ function RouteComponent() {
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-green-600 h-2 rounded-full"
-                    style={{ width: `${(report.serviceQualityScore / 10) * 100}%` }}
+                    style={{ width: `${(report.service_quality_score / 10) * 100}%` }}
                   ></div>
                 </div>
               </div>
-              <span className={`text-2xl font-bold ${getScoreColor(report.serviceQualityScore, 10)}`}>
-                {report.serviceQualityScore}
+              <span className={`text-2xl font-bold ${getScoreColor(report.service_quality_score, 10)}`}>
+                {report.service_quality_score}
               </span>
             </div>
           ) : isReportFailed ? (
@@ -337,7 +339,7 @@ function RouteComponent() {
       {isReportCompleted ? (
         <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">报告摘要</h3>
-          <p className="text-gray-700 leading-relaxed">{report.reportSummary}</p>
+          <p className="text-gray-700 leading-relaxed">{report.report_summary}</p>
         </div>
       ) : isReportFailed ? (
         <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
@@ -372,7 +374,7 @@ function RouteComponent() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">改进建议</h3>
           <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
-            <p className="text-gray-700 leading-relaxed">{report.improvementSuggestions}</p>
+              <p className="text-gray-700 leading-relaxed">{report.improvement_suggestions}</p>
           </div>
         </div>
       ) : isReportFailed ? (
@@ -447,10 +449,10 @@ function RouteComponent() {
                    <td className="px-6 py-4 whitespace-nowrap">
                      <div>
                        <div className="text-sm font-medium text-gray-900">
-                         {customerReport.customerName}
+                         {customerReport.customer_name}
                        </div>
                        <div className="text-sm text-gray-500">
-                         ID: {customerReport.customerId}
+                         ID: {customerReport.customer_id}
                        </div>
                      </div>
                    </td>
@@ -460,7 +462,7 @@ function RouteComponent() {
                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                        </svg>
                        <span className="text-sm font-medium text-gray-900">
-                         {customerReport.messageCount}
+                         {customerReport.message_count}
                        </span>
                      </div>
                    </td>
@@ -470,7 +472,7 @@ function RouteComponent() {
                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                        </svg>
                        <span className="text-sm text-gray-900">
-                         {customerReport.responseTimeAvg}分钟
+                         {customerReport.response_time_avg}分钟
                        </span>
                      </div>
                    </td>
@@ -481,7 +483,7 @@ function RouteComponent() {
                            <svg
                              key={i}
                              className={`w-4 h-4 ${
-                               i < Math.floor(customerReport.satisfactionScore)
+                               i < Math.floor(customerReport.satisfaction_score)
                                  ? 'text-yellow-400'
                                  : 'text-gray-300'
                              }`}
@@ -493,29 +495,29 @@ function RouteComponent() {
                          ))}
                        </div>
                        <span className="ml-2 text-sm text-gray-600">
-                         {customerReport.satisfactionScore}
+                         {customerReport.satisfaction_score}
                        </span>
                      </div>
                    </td>
                    <td className="px-6 py-4 whitespace-nowrap">
-                     <span className={`text-sm font-medium ${getScoreColor(customerReport.serviceQualityScore, 10)}`}>
-                       {customerReport.serviceQualityScore}
+                     <span className={`text-sm font-medium ${getScoreColor(customerReport.service_quality_score, 10)}`}>
+                       {customerReport.service_quality_score}
                      </span>
                    </td>
                    <td className="px-6 py-4 whitespace-nowrap">
                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                       customerReport.violationCount === 0
+                       customerReport.violation_count === 0
                          ? 'bg-green-100 text-green-800'
-                         : customerReport.violationCount <= 2
+                         : customerReport.violation_count <= 2
                          ? 'bg-yellow-100 text-yellow-800'
                          : 'bg-red-100 text-red-800'
                      }`}>
-                       {customerReport.violationCount === 0 ? '无违规' : `${customerReport.violationCount}次`}
+                       {customerReport.violation_count === 0 ? '无违规' : `${customerReport.violation_count}次`}
                      </span>
                    </td>
                                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     {(() => {
-                      const chatSession = getChatSession(customerReport.qwAccountId, customerReport.customerId, '2024-09-01')
+                      const chatSession = getChatSession(customerReport.qw_account_id, customerReport.customer_id, '2024-09-01')
                       return chatSession ? (
                         <Link
                           to="/admin/chat/$sessionId"

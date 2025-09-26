@@ -5,7 +5,7 @@ import type { Staff } from '@/api/types'
 
 // 获取员工列表
 export const useStaffs = () => {
-  const { data: staffs = [], isLoading, error, refetch } = useQuery({
+  const { data: staffs, isLoading, error, refetch } = useQuery({
     queryKey: ['staffs'],
     queryFn: getStaffs,
   })

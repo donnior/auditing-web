@@ -31,40 +31,40 @@ export interface PaginationResponse<T> {
 // 报告类型定义
 export interface Report {
   id: string
-  qwAccountId: string
-  qwAccountName: string
-  cycleStartTime: string
-  cycleEndTime: string
-  reportSummary: string
-  totalCustomers: number
-  totalMessages: number
-  avgResponseTime: number
-  overallSatisfaction: number
-  totalViolations: number
-  serviceQualityScore: number
-  performanceRating: string
-  improvementSuggestions: string
-  generationStatus: 'generating' | 'completed' | 'failed'
-  createdAt: string
-  updatedAt: string
+  qw_account_id: string
+  qw_account_name: string
+  cycle_start_time: string
+  cycle_end_time: string
+  report_summary: string
+  total_customers: number
+  total_messages: number
+  avg_response_time: number
+  overall_satisfaction: number
+  total_violations: number
+  service_quality_score: number
+  performance_rating: string
+  improvement_suggestions: string
+  generation_status: 'generating' | 'completed' | 'failed'
+  create_time: string
+  update_time: string
 }
 
 // 客户报告类型定义
 export interface CustomerReport {
   id: string
-  qwAccountId: string
-  qwAccountName: string
-  customerId: string
-  customerName: string
-  cycleStartTime: string
-  cycleEndTime: string
-  reportSummary: string
-  messageCount: number
-  responseTimeAvg: number
-  satisfactionScore: number
-  violationCount: number
-  serviceQualityScore: number
-  createTime: string
+  qw_account_id: string
+  qw_account_name: string
+  customer_id: string
+  customer_name: string
+  cycle_start_time: string
+  cycle_end_time: string
+  report_summary: string
+  message_count: number
+  response_time_avg: number
+  satisfaction_score: number
+  violation_count: number
+  service_quality_score: number
+  create_time: string
 }
 
 // 聊天消息类型定义
@@ -85,10 +85,10 @@ export interface ChatMessage {
 export interface Staff {
   id: string
   name: string
-  qwAccountId: string
-  autoGenerateReport: boolean
-  createdAt: string
-  updatedAt: string
+  qwid: string
+  auto_analyze: boolean
+  create_time: string
+  update_time: string
 }
 
 // 聊天会话类型定义
@@ -109,4 +109,9 @@ export interface ChatSession {
   violationCount: number
   satisfactionScore?: number
   messages: ChatMessage[]
+}
+
+export interface PageResponse<T> {
+  items: T[]
+  total_elements: number
 }

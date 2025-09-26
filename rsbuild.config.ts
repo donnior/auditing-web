@@ -18,5 +18,13 @@ export default defineConfig({
       ],
     },
   },
+  server: {
+    proxy: {
+      '/xcauditing': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+    },
+  },
 
 });

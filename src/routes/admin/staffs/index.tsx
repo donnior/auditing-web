@@ -97,14 +97,14 @@ function RouteComponent() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {staffs.length === 0 ? (
+            {staffs?.items?.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
                   暂无员工数据
                 </td>
               </tr>
             ) : (
-              staffs.map((staff) => (
+              staffs?.items?.map((staff) => (
                 <tr key={staff.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -123,25 +123,25 @@ function RouteComponent() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {staff.qwAccountId}
+                    {staff.qwid}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      staff.autoGenerateReport
+                      staff.auto_analyze
                         ? 'bg-green-100 text-green-800'
                         : 'bg-gray-100 text-gray-800'
                     }`}>
-                      {staff.autoGenerateReport ? '是' : '否'}
+                      {staff.auto_analyze ? '是' : '否'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {new Date(staff.createdAt).toLocaleDateString('zh-CN')}
+                    {new Date(staff.create_time).toLocaleDateString('zh-CN')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center gap-2">
                       <Link
                         to="/admin/reports"
-                        search={{ staff: staff.name }}
+                        search={{ staff: staff.id }}
                         className="text-blue-600 hover:text-blue-800"
                       >
                         查看报告
@@ -171,7 +171,7 @@ function RouteComponent() {
       {/* 统计信息 */}
       <div className="flex items-center justify-between mt-6">
         <div className="text-sm text-gray-700">
-          共 <span className="font-medium">{staffs.length}</span> 名员工
+          共 <span className="font-medium">{staffs?.items?.length}</span> 名员工
         </div>
       </div>
 
