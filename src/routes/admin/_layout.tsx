@@ -13,7 +13,7 @@ const AdminLayout = () => (
                 </svg>
               </div>
               <div className="text-xl font-bold text-gray-800">
-                客服审计系统
+                客服质检系统
               </div>
             </Link>
             <nav className="flex space-x-8">

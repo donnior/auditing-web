@@ -1,4 +1,4 @@
-import type { Report, CustomerReport } from './types'
+import type { Report, AnalysisReport, CustomerReport } from './types'
 import type { PageResponse } from './types'
 import axios from 'axios'
 
@@ -9,9 +9,9 @@ export const getReportById = async (id: string): Promise<Report | undefined> => 
   return response.data
 }
 
-export const getReports = async (staffName?: string): Promise<PageResponse<Report>> => {
+export const getReports = async (staffName?: string): Promise<PageResponse<AnalysisReport>> => {
   console.log('staffName', staffName)
-  const response = await axios.get('/xcauditing/api/employee-analysis/daily', {
+  const response = await axios.get('/xcauditing/api/employee-analysis-report', {
     params: {
       staffName: staffName || ''
     }

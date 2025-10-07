@@ -28,6 +28,24 @@ export interface PaginationResponse<T> {
   total: number
 }
 
+export interface AnalysisReport {
+  id: string
+  employee_id: string
+  report_type: string
+  qw_account_id: string
+  qw_account_name: string
+  cycle_start_time: string
+  cycle_end_time: string
+  report_summary: string
+  report_rating: string
+  report_score: number
+  report_suggestions: string
+  report_status: 'generating' | 'completed' | 'failed'
+  attribute: object
+  create_time: string
+  update_time: string
+}
+
 // 报告类型定义
 export interface Report {
   id: string
