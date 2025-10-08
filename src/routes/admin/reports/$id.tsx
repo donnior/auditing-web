@@ -2,6 +2,11 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { getReportById, getCustomerReportsByAccountId } from '@/api/reports'
 import { getChatSession } from '../../../api/mock/chats'
 import type { Report, CustomerReport } from '@/api/types'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import { CustomAttributes } from './_components/CustomAttributes'
+import { formatDate } from '@/lib/utils'
+import { CheckIcon, SpinnerIcon, CrossIcon, BackArrow, AlertTriangleIcon, ClockIcon, MessageIcon, StarIcon } from '@/components/icons'
 
 export const Route = createFileRoute('/admin/reports/$id')({
   loader: async ({ params }) => {
@@ -21,16 +26,6 @@ export const Route = createFileRoute('/admin/reports/$id')({
 
 function RouteComponent() {
   const { report, customerReports } = Route.useLoaderData()
-  console.log('report', report)
-  console.log('customerReports', customerReports)
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('zh-CN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
 
   const getPerformanceColor = (rating: string) => {
     switch (rating) {
@@ -47,36 +42,25 @@ function RouteComponent() {
 
   const getGenerationStatusDisplay = (status: string) => {
     switch (status) {
-      case 'completed':
+      case 'COMPLETED':
         return {
           text: '已完成',
           color: 'bg-green-100 text-green-800',
-          icon: (
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          )
+          icon: <CheckIcon className="w-4 h-4 mr-2" />
         }
-      case 'generating':
+      case 'PROCESSING':
         return {
           text: '生成中',
           color: 'bg-blue-100 text-blue-800',
           icon: (
-            <svg className="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
+            <SpinnerIcon className="w-4 h-4 mr-2 animate-spin" />
           )
         }
-      case 'failed':
+      case 'FAILED':
         return {
           text: '生成失败',
           color: 'bg-red-100 text-red-800',
-          icon: (
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          )
+          icon: <CrossIcon className="w-4 h-4 mr-2" />
         }
       default:
         return {
@@ -87,9 +71,9 @@ function RouteComponent() {
     }
   }
 
-  const isReportCompleted = report.generation_status === 'completed' || true
-  const isReportGenerating = report.generation_status === 'generating'
-  const isReportFailed = report.generation_status === 'failed'
+  const isReportCompleted = report.generating_status === 'COMPLETED' || true
+  const isReportGenerating = report.generating_status === 'PROCESSING'
+  const isReportFailed = report.generating_status === 'FAILED'
 
   const getScoreColor = (score: number, maxScore: number = 10) => {
     const percentage = (score / maxScore) * 100
@@ -97,6 +81,8 @@ function RouteComponent() {
     if (percentage >= 60) return 'text-yellow-600'
     return 'text-red-600'
   }
+
+  const statusDisplay = getGenerationStatusDisplay(report.generating_status)
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -106,9 +92,7 @@ function RouteComponent() {
           to="/admin/reports"
           className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+          <BackArrow />
           返回列表
         </Link>
         <span className="text-gray-400">/</span>
@@ -120,18 +104,18 @@ function RouteComponent() {
         <div className="flex justify-between items-start mb-4">
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">{report.qw_account_name} 的工作报告【2025/09/01】</h2>
-            <p className="text-gray-600">账号ID: {report.qw_account_id}</p>
+            {/* <p className="text-gray-600">账号ID: {report.qw_account_id}</p> */}
           </div>
           <div className="flex items-center gap-3">
             {/* 生成状态 */}
-            <span className={`inline-flex items-center px-3 py-1 text-sm font-semibold rounded-full ${getGenerationStatusDisplay(report.generation_status).color}`}>
-              {getGenerationStatusDisplay(report.generation_status).icon}
-              {getGenerationStatusDisplay(report.generation_status).text}
+            <span className={`inline-flex items-center px-3 py-1 text-sm font-semibold rounded-full ${statusDisplay.color}`}>
+              {statusDisplay.icon}
+              {statusDisplay.text}
             </span>
             {/* 只有已完成的报告才显示绩效评级 */}
             {isReportCompleted && (
-              <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getPerformanceColor(report.performance_rating)}`}>
-                {report.performance_rating}
+              <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getPerformanceColor(report.report_rating)}`}>
+                {report.report_rating}
               </span>
             )}
           </div>
@@ -152,140 +136,22 @@ function RouteComponent() {
       </div>
 
       {/* 核心指标卡片 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">服务客户数</p>
-              {isReportCompleted ? (
-                <p className="text-2xl font-bold text-gray-900">{report.total_customers}</p>
-              ) : isReportFailed ? (
-                <div className="flex items-center">
-                  <span className="text-xl font-bold text-red-500">--</span>
-                  <span className="ml-2 text-sm text-red-500">生成失败</span>
-                </div>
-              ) : (
-                <div className="flex items-center">
-                  <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
-                  <span className="ml-2 text-sm text-gray-500">分析中...</span>
-                </div>
-              )}
-            </div>
-            <div className="p-3 bg-blue-100 rounded-full">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5zm.5 3.5h2.5a2.5 2.5 0 010 5h-2.5v-5z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">消息总数</p>
-              {isReportCompleted ? (
-                <p className="text-2xl font-bold text-gray-900">{report.total_messages}</p>
-              ) : isReportFailed ? (
-                <div className="flex items-center">
-                  <span className="text-xl font-bold text-red-500">--</span>
-                  <span className="ml-2 text-sm text-red-500">生成失败</span>
-                </div>
-              ) : (
-                <div className="flex items-center">
-                  <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
-                  <span className="ml-2 text-sm text-gray-500">分析中...</span>
-                </div>
-              )}
-            </div>
-            <div className="p-3 bg-green-100 rounded-full">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">平均响应时间</p>
-              {isReportCompleted ? (
-                <p className="text-2xl font-bold text-gray-900">{report.avg_response_time}分钟</p>
-              ) : isReportFailed ? (
-                <div className="flex items-center">
-                  <span className="text-xl font-bold text-red-500">--</span>
-                  <span className="ml-2 text-sm text-red-500">生成失败</span>
-                </div>
-              ) : (
-                <div className="flex items-center">
-                  <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
-                  <span className="ml-2 text-sm text-gray-500">分析中...</span>
-                </div>
-              )}
-            </div>
-            <div className="p-3 bg-yellow-100 rounded-full">
-              <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">违规次数</p>
-              {isReportCompleted ? (
-                <p className="text-2xl font-bold text-red-600">{report.total_violations}</p>
-              ) : isReportFailed ? (
-                <div className="flex items-center">
-                  <span className="text-xl font-bold text-red-500">--</span>
-                  <span className="ml-2 text-sm text-red-500">生成失败</span>
-                </div>
-              ) : (
-                <div className="flex items-center">
-                  <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
-                  <span className="ml-2 text-sm text-gray-500">分析中...</span>
-                </div>
-              )}
-            </div>
-            <div className="p-3 bg-red-100 rounded-full">
-              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
+      <CustomAttributes report={report} />
 
       {/* 评分指标 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">客户满意度</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">服务评级</h3>
           {isReportCompleted ? (
             <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <div className="flex justify-between text-sm text-gray-600 mb-2">
-                  <span>1.0</span>
-                  <span>5.0</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full"
-                    style={{ width: `${(report.overall_satisfaction / 5) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-              <span className={`text-2xl font-bold ${getScoreColor(report.overall_satisfaction, 5)}`}>
-                {report.overall_satisfaction}
+              <span className={`text-2xl font-bold`}>
+                {report.report_rating}
               </span>
             </div>
           ) : isReportFailed ? (
             <div className="flex items-center justify-center h-16">
               <div className="text-center">
-                <svg className="w-8 h-8 mx-auto text-red-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <CrossIcon className="w-8 h-8 mx-auto text-red-400 mb-2" />
                 <p className="text-red-500 text-sm">生成失败</p>
               </div>
             </div>
@@ -298,7 +164,7 @@ function RouteComponent() {
         </div>
 
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">服务质量评分</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">服务评分</h3>
           {isReportCompleted ? (
             <div className="flex items-center gap-4">
               <div className="flex-1">
@@ -309,20 +175,18 @@ function RouteComponent() {
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-green-600 h-2 rounded-full"
-                    style={{ width: `${(report.service_quality_score / 10) * 100}%` }}
+                    style={{ width: `${(report.report_score / 10) * 100}%` }}
                   ></div>
                 </div>
               </div>
-              <span className={`text-2xl font-bold ${getScoreColor(report.service_quality_score, 10)}`}>
-                {report.service_quality_score}
+              <span className={`text-2xl font-bold ${getScoreColor(report.report_score, 10)}`}>
+                {report.report_score}
               </span>
             </div>
           ) : isReportFailed ? (
             <div className="flex items-center justify-center h-16">
               <div className="text-center">
-                <svg className="w-8 h-8 mx-auto text-red-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <CrossIcon className="w-8 h-8 mx-auto text-red-400 mb-2" />
                 <p className="text-red-500 text-sm">生成失败</p>
               </div>
             </div>
@@ -339,16 +203,18 @@ function RouteComponent() {
       {isReportCompleted ? (
         <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">报告摘要</h3>
-          <p className="text-gray-700 leading-relaxed">{report.report_summary}</p>
+          <div className="prose max-w-none text-gray-700 leading-relaxed">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {report.report_summary}
+            </ReactMarkdown>
+          </div>
         </div>
       ) : isReportFailed ? (
         <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">报告摘要</h3>
           <div className="flex items-center justify-center h-24 bg-red-50 rounded-lg border-2 border-red-100">
             <div className="text-center">
-              <svg className="w-8 h-8 mx-auto text-red-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
+              <AlertTriangleIcon className="w-8 h-8 mx-auto text-red-400 mb-2" />
               <p className="text-red-600 text-sm font-medium">报告生成失败</p>
               <p className="text-red-500 text-xs mt-1">请联系技术支持或重新生成</p>
             </div>
@@ -359,10 +225,7 @@ function RouteComponent() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">报告摘要</h3>
           <div className="flex items-center justify-center h-24 bg-gray-50 rounded-lg">
             <div className="text-center">
-              <svg className="w-8 h-8 mx-auto text-gray-400 mb-2 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 818-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
+              <SpinnerIcon className="w-8 h-8 mx-auto text-gray-400 mb-2 animate-spin" />
               <p className="text-gray-500 text-sm">正在生成报告摘要...</p>
             </div>
           </div>
@@ -374,7 +237,11 @@ function RouteComponent() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">改进建议</h3>
           <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
-              <p className="text-gray-700 leading-relaxed">{report.improvement_suggestions}</p>
+            <div className="prose max-w-none text-gray-700 leading-relaxed">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {report.report_suggestions}
+              </ReactMarkdown>
+            </div>
           </div>
         </div>
       ) : isReportFailed ? (
@@ -382,9 +249,7 @@ function RouteComponent() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">改进建议</h3>
           <div className="flex items-center justify-center h-24 bg-red-50 rounded-lg border-2 border-red-100">
             <div className="text-center">
-              <svg className="w-8 h-8 mx-auto text-red-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
+              <AlertTriangleIcon className="w-8 h-8 mx-auto text-red-400 mb-2" />
               <p className="text-red-600 text-sm font-medium">改进建议生成失败</p>
               <p className="text-red-500 text-xs mt-1">请联系技术支持或重新生成</p>
             </div>
@@ -395,10 +260,7 @@ function RouteComponent() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">改进建议</h3>
           <div className="flex items-center justify-center h-24 bg-gray-50 rounded-lg">
             <div className="text-center">
-              <svg className="w-8 h-8 mx-auto text-gray-400 mb-2 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 818-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
+              <SpinnerIcon className="w-8 h-8 mx-auto text-gray-400 mb-2 animate-spin" />
               <p className="text-gray-500 text-sm">正在生成改进建议...</p>
             </div>
           </div>
@@ -458,9 +320,7 @@ function RouteComponent() {
                    </td>
                    <td className="px-6 py-4 whitespace-nowrap">
                      <div className="flex items-center">
-                       <svg className="w-4 h-4 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                       </svg>
+                       <MessageIcon className="w-4 h-4 text-blue-500 mr-2" />
                        <span className="text-sm font-medium text-gray-900">
                          {customerReport.message_count}
                        </span>
@@ -468,9 +328,7 @@ function RouteComponent() {
                    </td>
                    <td className="px-6 py-4 whitespace-nowrap">
                      <div className="flex items-center">
-                       <svg className="w-4 h-4 text-yellow-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                       </svg>
+                       <ClockIcon className="w-4 h-4 text-yellow-500 mr-2" />
                        <span className="text-sm text-gray-900">
                          {customerReport.response_time_avg}分钟
                        </span>
@@ -480,18 +338,14 @@ function RouteComponent() {
                      <div className="flex items-center">
                        <div className="flex items-center">
                          {[...Array(5)].map((_, i) => (
-                           <svg
+                           <StarIcon
                              key={i}
                              className={`w-4 h-4 ${
                                i < Math.floor(customerReport.satisfaction_score)
                                  ? 'text-yellow-400'
                                  : 'text-gray-300'
                              }`}
-                             fill="currentColor"
-                             viewBox="0 0 20 20"
-                           >
-                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                           </svg>
+                           />
                          ))}
                        </div>
                        <span className="ml-2 text-sm text-gray-600">
@@ -539,36 +393,6 @@ function RouteComponent() {
              </tbody>
            </table>
          </div>
-
-         {/* 汇总信息 */}
-         {/* <div className="mt-6 border-t border-gray-200 pt-4">
-           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-             <div className="text-center">
-               <div className="text-2xl font-bold text-blue-600">
-                 {customerReports.reduce((sum, report) => sum + report.messageCount, 0)}
-               </div>
-               <div className="text-sm text-gray-600">总消息数</div>
-             </div>
-             <div className="text-center">
-               <div className="text-2xl font-bold text-green-600">
-                 {(customerReports.reduce((sum, report) => sum + report.responseTimeAvg, 0) / customerReports.length).toFixed(1)}分钟
-               </div>
-               <div className="text-sm text-gray-600">平均响应时间</div>
-             </div>
-             <div className="text-center">
-               <div className="text-2xl font-bold text-yellow-600">
-                 {(customerReports.reduce((sum, report) => sum + report.satisfactionScore, 0) / customerReports.length).toFixed(1)}
-               </div>
-               <div className="text-sm text-gray-600">平均满意度</div>
-             </div>
-             <div className="text-center">
-               <div className="text-2xl font-bold text-red-600">
-                 {customerReports.reduce((sum, report) => sum + report.violationCount, 0)}
-               </div>
-               <div className="text-sm text-gray-600">总违规次数</div>
-             </div>
-           </div>
-         </div> */}
        </div>
 
       </div>

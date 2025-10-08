@@ -1,16 +1,13 @@
-import type { Report, AnalysisReport, CustomerReport } from './types'
+import type { Report, CustomerReport } from './types'
 import type { PageResponse } from './types'
 import axios from 'axios'
 
-import { mockReports, mockCustomerReports } from './mock/reports'
-
 export const getReportById = async (id: string): Promise<Report | undefined> => {
-  const response = await axios.get(`/xcauditing/api/employee-analysis/daily/${id}`)
+  const response = await axios.get(`/xcauditing/api/employee-analysis-report/${id}`)
   return response.data
 }
 
-export const getReports = async (staffName?: string): Promise<PageResponse<AnalysisReport>> => {
-  console.log('staffName', staffName)
+export const getReports = async (staffName?: string): Promise<PageResponse<Report>> => {
   const response = await axios.get('/xcauditing/api/employee-analysis-report', {
     params: {
       staffName: staffName || ''

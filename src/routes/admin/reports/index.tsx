@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { getReports } from '@/api/reports'
-import { formatDate } from '@/lib/utils'
 import ReportsTable from './_components/ReportsTable'
 import { BackArrow } from '@/components/icons'
 
@@ -28,20 +27,6 @@ function RouteComponent() {
     queryKey: ['reports', staff, currentPage, pageSize],
     queryFn: () => getReports(staff),
   })
-
-  console.log('data', data)
-
-  // 转换数据格式以适配表格组件
-  const reports = data?.items?.map(report => ({
-    id: report.id,
-    title: `【${formatDate(report.cycleStartTime)}】${report.qwAccountName}`,
-    staff: report.qwAccountName,
-    period: formatDate(report.cycleStartTime),
-    status: report.totalViolations > 3 ? '违规' : '正常',
-    generationStatus: report.generationStatus,
-    createdAt: formatDate(report.createdAt),
-    views: Math.floor(Math.random() * 2000) + 500 // 随机生成浏览量
-  }))
 
   return (
     <div>

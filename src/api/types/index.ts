@@ -28,24 +28,6 @@ export interface PaginationResponse<T> {
   total: number
 }
 
-export interface AnalysisReport {
-  id: string
-  employee_id: string
-  report_type: string
-  qw_account_id: string
-  qw_account_name: string
-  cycle_start_time: string
-  cycle_end_time: string
-  report_summary: string
-  report_rating: string
-  report_score: number
-  report_suggestions: string
-  report_status: 'generating' | 'completed' | 'failed'
-  attribute: object
-  create_time: string
-  update_time: string
-}
-
 // 报告类型定义
 export interface Report {
   id: string
@@ -53,16 +35,12 @@ export interface Report {
   qw_account_name: string
   cycle_start_time: string
   cycle_end_time: string
+  report_rating: string
+  report_score: number
+  report_suggestions: string
   report_summary: string
-  total_customers: number
-  total_messages: number
-  avg_response_time: number
-  overall_satisfaction: number
-  total_violations: number
-  service_quality_score: number
-  performance_rating: string
-  improvement_suggestions: string
-  generation_status: 'generating' | 'completed' | 'failed'
+  generating_status: 'PROCESSING' | 'COMPLETED' | 'FAILED'
+  attributes: Record<string, any>
   create_time: string
   update_time: string
 }

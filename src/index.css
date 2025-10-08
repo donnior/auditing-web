@@ -49,6 +49,106 @@
     --main-color: #3a48be;
 }
 
+/* Markdown样式 - prose类 */
+.prose {
+    & ul {
+        list-style-type: disc;
+        padding-left: 1.5rem;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    & ol {
+        list-style-type: decimal;
+        padding-left: 1.5rem;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    & li {
+        margin-top: 0.25rem;
+        margin-bottom: 0.25rem;
+        padding-left: 0.25rem;
+    }
+
+    & li > ul,
+    & li > ol {
+        margin-top: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+
+    & p {
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    & h1, & h2, & h3, & h4, & h5, & h6 {
+        font-weight: 600;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    & h1 {
+        font-size: 1.5rem;
+    }
+
+    & h2 {
+        font-size: 1.25rem;
+    }
+
+    & h3 {
+        font-size: 1.125rem;
+    }
+
+    & strong {
+        font-weight: 600;
+    }
+
+    & em {
+        font-style: italic;
+    }
+
+    & code {
+        background-color: rgb(243 244 246);
+        padding: 0.125rem 0.25rem;
+        border-radius: 0.25rem;
+        font-size: 0.875em;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    & pre {
+        background-color: rgb(243 244 246);
+        padding: 1rem;
+        border-radius: 0.375rem;
+        overflow-x: auto;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    & pre code {
+        background-color: transparent;
+        padding: 0;
+    }
+
+    & blockquote {
+        border-left: 4px solid rgb(229 231 235);
+        padding-left: 1rem;
+        font-style: italic;
+        color: rgb(107 114 128);
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    & a {
+        color: rgb(59 130 246);
+        text-decoration: underline;
+    }
+
+    & a:hover {
+        color: rgb(37 99 235);
+    }
+}
+
 .dark {
     --background: oklch(0.141 0.005 285.823);
     --foreground: oklch(0.985 0 0);

@@ -10,8 +10,7 @@ export interface ReportItem {
   title: string
   staff: string
   period: string
-  status: string
-  generationStatus: 'completed' | 'generating' | 'failed'
+  generationStatus: 'COMPLETED' | 'PROCESSING' | 'FAILED'
   createdAt: string
   views?: number
 }
@@ -42,43 +41,26 @@ function ReportsTable({
     title: `【${formatDate(report.cycle_start_time)}】${report.qw_account_name}`,
     staff: report.qw_account_name,
     period: formatDate(report.cycle_start_time),
-    status: report.total_violations > 3 ? '违规' : '正常',
-    generationStatus: report.generation_status,
+    generationStatus: report.generating_status,
     createdAt: formatDate(report.create_time),
     views: Math.floor(Math.random() * 2000) + 500 // 随机生成浏览量
   }))
 
-
-
   // 生成状态渲染函数
   const renderGenerationStatus = (value: any, record: ReportItem) => (
     <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${
-      record.generationStatus === 'completed'
+      record.generationStatus === 'COMPLETED'
         ? 'bg-green-100 text-green-800'
-        : record.generationStatus === 'generating'
+      : record.generationStatus === 'PROCESSING'
         ? 'bg-blue-100 text-blue-800'
         : 'bg-red-100 text-red-800'
     }`}>
-      {record.generationStatus === 'generating' && <SpinnerIcon />}
-      {record.generationStatus === 'completed' && <CheckIcon />}
-      {record.generationStatus === 'failed' && <CrossIcon />}
-      {record.generationStatus === 'completed' ? '已完成' : record.generationStatus === 'generating' ? '生成中' : '生成失败'}
+      {record.generationStatus === 'PROCESSING' && <SpinnerIcon />}
+      {record.generationStatus === 'COMPLETED' && <CheckIcon />}
+      {record.generationStatus === 'FAILED' && <CrossIcon />}
+      {record.generationStatus === 'COMPLETED' ? '已完成' : record.generationStatus === 'PROCESSING' ? '生成中' : '生成失败'}
+      {/* {record.generationStatus} */}
     </span>
-  )
-
-  // 行为评级渲染函数
-  const renderBehaviorRating = (value: any, record: ReportItem) => (
-    record.generationStatus === 'completed' ? (
-      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-        record.status === '正常'
-          ? 'bg-green-100 text-green-800'
-          : 'bg-yellow-100 text-yellow-800'
-      }`}>
-        {record.status}
-      </span>
-    ) : (
-      <span className="text-sm text-gray-400">-</span>
-    )
   )
 
   // 报告标题渲染函数
@@ -111,11 +93,6 @@ function ReportsTable({
       key: 'generationStatus',
       label: '生成状态',
       render: renderGenerationStatus
-    },
-    {
-      key: 'status',
-      label: '行为评级',
-      render: renderBehaviorRating
     },
     {
       key: 'createdAt',
