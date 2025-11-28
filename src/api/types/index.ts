@@ -29,39 +29,7 @@ export interface PaginationResponse<T> {
 }
 
 // 报告类型定义
-export interface Report {
-  id: string
-  qw_account_id: string
-  qw_account_name: string
-  cycle_start_time: string
-  cycle_end_time: string
-  report_rating: string
-  report_score: number
-  report_suggestions: string
-  report_summary: string
-  generating_status: 'PROCESSING' | 'COMPLETED' | 'FAILED'
-  attributes: Record<string, any>
-  create_time: string
-  update_time: string
-}
 
-// 客户报告类型定义
-export interface CustomerReport {
-  id: string
-  qw_account_id: string
-  qw_account_name: string
-  customer_id: string
-  customer_name: string
-  cycle_start_time: string
-  cycle_end_time: string
-  report_summary: string
-  message_count: number
-  response_time_avg: number
-  satisfaction_score: number
-  violation_count: number
-  service_quality_score: number
-  create_time: string
-}
 
 // 聊天消息类型定义
 export interface ChatMessage {
@@ -77,15 +45,6 @@ export interface ChatMessage {
   violationType?: string
 }
 
-// 员工类型定义
-export interface Staff {
-  id: string
-  name: string
-  qwid: string
-  auto_analyze: boolean
-  create_time: string
-  update_time: string
-}
 
 // 聊天会话类型定义
 export interface ChatSession {
@@ -105,9 +64,4 @@ export interface ChatSession {
   violationCount: number
   satisfactionScore?: number
   messages: ChatMessage[]
-}
-
-export interface PageResponse<T> {
-  items: T[]
-  total_elements: number
 }

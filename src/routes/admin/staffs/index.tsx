@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
-import { useStaffs, useCreateStaff, useUpdateStaff, useDeleteStaff } from '@/hooks/useStaffs'
+import { useStaffs, useCreateStaff, useUpdateStaff, useDeleteStaff } from '@/modules/staffs/useStaffs'
 import { StaffModal } from '@/components/StaffModal'
-import type { CreateStaffData } from '@/api/staffs'
+import type { CreateStaffData } from '@/modules/staffs/api'
 import type { Staff } from '@/api/types'
 
 export const Route = createFileRoute('/admin/staffs/')({

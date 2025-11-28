@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { getReportById, getCustomerReportsByAccountId } from '@/api/reports'
-import { getChatSession } from '../../../api/mock/chats'
-import type { Report, CustomerReport } from '@/api/types'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { createFileRoute, Link } from '@tanstack/react-router'
+
+import { getReportById, getCustomerReportsByAccountId } from '@/modules/reports/api'
+import { getChatSession } from '../../../api/mock/chats'
+
 import { CustomAttributes } from './_components/CustomAttributes'
 import { formatDate } from '@/lib/utils'
 import { CheckIcon, SpinnerIcon, CrossIcon, BackArrow, AlertTriangleIcon, ClockIcon, MessageIcon, StarIcon } from '@/components/icons'

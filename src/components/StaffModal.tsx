@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import type { CreateStaffData } from '@/api/staffs'
+import type { CreateStaffData } from '@/modules/staffs/api'
 import type { Staff } from '@/api/types'
 
 interface StaffModalProps {

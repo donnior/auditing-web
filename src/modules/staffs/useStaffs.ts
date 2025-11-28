@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { getStaffs, createStaff, updateStaff, deleteStaff } from '@/api/staffs'
-import type { CreateStaffData, UpdateStaffData } from '@/api/staffs'
-import type { Staff } from '@/api/types'
+import { getStaffs, createStaff, updateStaff, deleteStaff } from './api'
+import type { Staff, CreateStaffData, UpdateStaffData } from '@/modules/staffs/api'
 
 // 获取员工列表
 export const useStaffs = () => {
