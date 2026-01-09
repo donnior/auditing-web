@@ -3,12 +3,13 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
-import { getReports } from '@/modules/reports/api'
+import { getReports, type WeeklyReportSummary } from '@/modules/reports/api'
+import type { PageResponse } from '@/modules/common/types'
 import ReportsTable from './_components/ReportsTable'
 import { BackArrow } from '@/components/icons'
 
 const searchSchema = z.object({
-  staff: z.string().optional(),
+  staff: z.coerce.string().optional(),
 })
 
 export const Route = createFileRoute('/admin/reports/')({
@@ -20,10 +21,10 @@ function RouteComponent() {
   const { staff } = Route.useSearch()
 
   const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
+  const [pageSize, setPageSize] = useState(100)
 
   // 使用React Query获取报告数据
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery<PageResponse<WeeklyReportSummary>>({
     queryKey: ['reports', staff, currentPage, pageSize],
     queryFn: () => getReports(staff),
   })
@@ -48,14 +49,16 @@ function RouteComponent() {
           </h1>
           {staff && (
             <p className="text-sm text-gray-600 mt-1">
-              共找到 {data?.items?.length} 条报告记录
+              共找到 {data?.content?.length} 条报告记录
             </p>
           )}
         </div>
       </div>
 
-      {data?.items && <ReportsTable
-        data={data?.items}
+
+
+      {data?.content && <ReportsTable
+        data={data?.content}
         isLoading={isLoading}
         error={error}
         currentPage={currentPage}

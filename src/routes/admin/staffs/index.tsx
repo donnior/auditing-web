@@ -2,8 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useStaffs, useCreateStaff, useUpdateStaff, useDeleteStaff } from '@/modules/staffs/useStaffs'
 import { StaffModal } from '@/components/StaffModal'
-import type { CreateStaffData } from '@/modules/staffs/api'
-import type { Staff } from '@/api/types'
+import type { Staff, CreateStaffData } from '@/modules/staffs/api'
 
 export const Route = createFileRoute('/admin/staffs/')({
   component: RouteComponent,
@@ -97,14 +96,14 @@ function RouteComponent() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {staffs?.items?.length === 0 ? (
+            {staffs?.content?.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
                   暂无员工数据
                 </td>
               </tr>
             ) : (
-              staffs?.items?.map((staff) => (
+                staffs?.content?.map((staff) => (
                 <tr key={staff.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -123,7 +122,7 @@ function RouteComponent() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {staff.qwid}
+                    {staff.qw_id}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -140,8 +139,7 @@ function RouteComponent() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center gap-2">
                       <Link
-                        to="/admin/reports"
-                        search={{ staff: staff.id }}
+                        to={'/admin/reports?staff='+`${staff.id}`}
                         className="text-blue-600 hover:text-blue-800"
                       >
                         查看报告

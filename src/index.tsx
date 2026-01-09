@@ -6,8 +6,10 @@ const queryClient = new QueryClient()
 // Import the generated route tree
 import { routeTree } from './routeTree.gen'
 import './index.css'
+// import { parseSearch, stringifySearch } from './lib/searchParams'
 
 // Create a new router instance
+// const router = createRouter({ routeTree, parseSearch, stringifySearch })
 const router = createRouter({ routeTree })
 
 // Register the router instance for type safety

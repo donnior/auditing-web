@@ -1,15 +1,19 @@
 import type { PageResponse } from '../common/types'
 import axios from 'axios'
 
-export const getReportById = async (id: string): Promise<Report | undefined> => {
-  const response = await axios.get(`/xcauditing/api/employee-analysis-report/${id}`)
+export const getWeeklyReportSummaryById = async (id: string): Promise<WeeklyReportSummary | undefined> => {
+  const response = await axios.get(`/auditing-api/weekly-report-summaries/${id}`)
   return response.data
 }
 
-export const getReports = async (staffName?: string): Promise<PageResponse<Report>> => {
-  const response = await axios.get('/xcauditing/api/employee-analysis-report', {
+export const getReports = async (staffName?: string, employeeId?: string, evalPeriod?: string, evalType?: string): Promise<PageResponse<WeeklyReportSummary>> => {
+  const response = await axios.get('/auditing-api/weekly-report-summaries', {
     params: {
-      staffName: staffName || ''
+      staffName: staffName || '',
+      page_size: 100,
+      employeeId: '',
+      evalPeriod: '',
+      evalType: ''
     }
   })
   return response.data
@@ -40,6 +44,32 @@ export interface Report {
   attributes: Record<string, any>
   create_time: string
   update_time: string
+}
+
+export interface WeeklyReportSummary {
+  id: string
+  employee_id: string
+  employee_name: string
+  employee_qw_id: string
+  eval_time: string
+  eval_period: string
+  eval_type: string
+  total_customers: number
+  has_introduce_course_ratio: number
+  full_completed1_ratio: number
+  total_introduce_course: number
+  total_introduce_teacher: number
+  total_introduce_schedule: number
+  total_introduce_course_time: number
+  total_order_check: number
+  total_introduce_completed: number
+  total_material_send: number
+  total_course_remind: number
+  total_homework_publish: number
+  total_feedback_track: number
+  total_week_material_send: number
+  total_sunday_link_send: number
+  total_risk_word_trigger: number
 }
 
 // 客户报告类型定义

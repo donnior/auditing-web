@@ -1,4 +1,5 @@
 export interface PageResponse<T> {
-    items: T[]
+    items?: T[]
+    content?: T[]
     total_elements: number
 }

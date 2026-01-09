@@ -21,8 +21,8 @@ export const StaffModal: React.FC<StaffModalProps> = ({
 }) => {
   const [formData, setFormData] = useState<CreateStaffData>({
     name: '',
-    qwAccountId: '',
-    autoGenerateReport: false
+    qw_id: '',
+    // autoGenerateReport: false
   })
 
   const [errors, setErrors] = useState<Partial<CreateStaffData>>({})
@@ -32,14 +32,14 @@ export const StaffModal: React.FC<StaffModalProps> = ({
     if (mode === 'edit' && editingStaff) {
       setFormData({
         name: editingStaff.name,
-        qwAccountId: editingStaff.qwAccountId,
+        qw_id: editingStaff.qw_id,
         autoGenerateReport: editingStaff.autoGenerateReport
       })
     } else {
       // 创建模式时重置表单
       setFormData({
         name: '',
-        qwAccountId: '',
+        qw_id: '',
         autoGenerateReport: false
       })
     }
@@ -54,8 +54,8 @@ export const StaffModal: React.FC<StaffModalProps> = ({
     if (!formData.name.trim()) {
       newErrors.name = '请输入员工姓名'
     }
-    if (!formData.qwAccountId.trim()) {
-      newErrors.qwAccountId = '请输入企微ID'
+    if (!formData.qw_id?.trim()) {
+      newErrors.qw_id = '请输入企微ID'
     }
 
     setErrors(newErrors)
@@ -69,7 +69,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
       // 重置表单
       setFormData({
         name: '',
-        qwAccountId: '',
+        qw_id: '',
         autoGenerateReport: false
       })
       setErrors({})
@@ -82,7 +82,7 @@ export const StaffModal: React.FC<StaffModalProps> = ({
   const handleClose = () => {
     setFormData({
       name: '',
-      qwAccountId: '',
+      qw_id: '',
       autoGenerateReport: false
     })
     setErrors({})
@@ -148,15 +148,15 @@ export const StaffModal: React.FC<StaffModalProps> = ({
                 <input
                   type="text"
                   id="qwAccountId"
-                  value={formData.qwAccountId}
-                  onChange={(e) => setFormData(prev => ({ ...prev, qwAccountId: e.target.value }))}
+                value={formData.qw_id}
+                onChange={(e) => setFormData(prev => ({ ...prev, qw_id: e.target.value }))}
                   className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.qwAccountId ? 'border-red-300' : 'border-gray-300'
+                    errors.qw_id ? 'border-red-300' : 'border-gray-300'
                   }`}
                   placeholder="请输入企微ID"
                 />
-                {errors.qwAccountId && (
-                  <p className="mt-1 text-sm text-red-600">{errors.qwAccountId}</p>
+              {errors.qw_id && (
+                <p className="mt-1 text-sm text-red-600">{errors.qw_id}</p>
                 )}
               </div>
 

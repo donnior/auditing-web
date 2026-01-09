@@ -1,22 +1,21 @@
-import { Link } from '@tanstack/react-router'
-import { formatDate } from '@/lib/utils'
-import type { Report } from '@/api/types'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { daysBefore } from '@/lib/utils'
+import type { WeeklyReportSummary } from '@/modules/reports/api'
 import { Table, type TableColumn, type TableAction } from '@/components/Table'
-import { SpinnerIcon, CheckIcon, CrossIcon } from '@/components/icons'
+import { EVAL_TYPE_NAMES } from './util'
+import type { EvalType } from '@/constants';
 
-// 报告数据类型定义
 export interface ReportItem {
   id: string
   title: string
   staff: string
-  period: string
-  generationStatus: 'COMPLETED' | 'PROCESSING' | 'FAILED'
-  createdAt: string
-  views?: number
+  period: string,
+  total_customers: number,
+  has_introduce_course_ratio: number
 }
 
 interface ReportsTableProps {
-  data: Report[]
+  data: WeeklyReportSummary[]
   isLoading: boolean
   error: any
   currentPage: number
@@ -34,34 +33,32 @@ function ReportsTable({
   setCurrentPage,
   setPageSize
 }: ReportsTableProps) {
+  const navigate = useNavigate()
 
-  // 转换数据格式以适配表格组件
   const reports: ReportItem[] = data.map(report => ({
     id: report.id,
-    title: `【${formatDate(report.cycle_start_time)}】${report.qw_account_name}`,
-    staff: report.qw_account_name,
-    period: formatDate(report.cycle_start_time),
-    generationStatus: report.generating_status,
-    createdAt: formatDate(report.create_time),
-    views: Math.floor(Math.random() * 2000) + 500 // 随机生成浏览量
+    title: `${EVAL_TYPE_NAMES[report.eval_type as EvalType] || '未知'}`,
+    staff: report.employee_name,
+    period: `${report.eval_period}`,
+    total_customers: report.total_customers,
+    has_introduce_course_ratio: report.total_introduce_completed,
   }))
 
-  // 生成状态渲染函数
-  const renderGenerationStatus = (value: any, record: ReportItem) => (
-    <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${
-      record.generationStatus === 'COMPLETED'
-        ? 'bg-green-100 text-green-800'
-      : record.generationStatus === 'PROCESSING'
-        ? 'bg-blue-100 text-blue-800'
-        : 'bg-red-100 text-red-800'
-    }`}>
-      {record.generationStatus === 'PROCESSING' && <SpinnerIcon />}
-      {record.generationStatus === 'COMPLETED' && <CheckIcon />}
-      {record.generationStatus === 'FAILED' && <CrossIcon />}
-      {record.generationStatus === 'COMPLETED' ? '已完成' : record.generationStatus === 'PROCESSING' ? '生成中' : '生成失败'}
-      {/* {record.generationStatus} */}
-    </span>
-  )
+  // const renderGenerationStatus = (value: any, record: ReportItem) => (
+  //   <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${
+  //     record.generationStatus === 'COMPLETED'
+  //       ? 'bg-green-100 text-green-800'
+  //     : record.generationStatus === 'PROCESSING'
+  //       ? 'bg-blue-100 text-blue-800'
+  //       : 'bg-red-100 text-red-800'
+  //   }`}>
+  //     {record.generationStatus === 'PROCESSING' && <SpinnerIcon />}
+  //     {record.generationStatus === 'COMPLETED' && <CheckIcon />}
+  //     {record.generationStatus === 'FAILED' && <CrossIcon />}
+  //     {record.generationStatus === 'COMPLETED' ? '已完成' : record.generationStatus === 'PROCESSING' ? '生成中' : '生成失败'}
+  //     {/* {record.generationStatus} */}
+  //   </span>
+  // )
 
   // 报告标题渲染函数
   const renderTitle = (value: any, record: ReportItem) => (
@@ -77,35 +74,52 @@ function ReportsTable({
   // 定义表格列配置
   const columns: TableColumn<ReportItem>[] = [
     {
-      key: 'title',
-      label: '报告名称',
-      render: renderTitle
-    },
-    {
       key: 'staff',
       label: '员工'
     },
     {
       key: 'period',
-      label: '报告周期'
+      label: '统计周期',
+      render: (value: any, record: ReportItem) => {
+        return <span>
+          <span className='rounded-full px-2 py-1 text-xs  bg-gray-400 text-white'>
+            {daysBefore(record.period, 6)}
+          </span>
+          <span className='text-gray-500 px-1'>-</span>
+          <span className='rounded-full px-2 py-1 text-xs bg-gray-400 text-white'>
+            {record.period}
+          </span>
+        </span>
+      }
     },
     {
-      key: 'generationStatus',
-      label: '生成状态',
-      render: renderGenerationStatus
+      key: 'title',
+      label: '报告类型',
+      render: (value: any, record: ReportItem) => (
+        <span className='rounded-full px-2 py-1 text-xs font-semibold bg-gray-400 text-white'>
+          {value}
+        </span>
+      )
     },
     {
-      key: 'createdAt',
-      label: '生成时间'
+      key: 'total_customers',
+      label: '总客户数',
+    },
+    {
+      key: 'has_introduce_course_ratio',
+      label: '完全完成人数',
+      render: (value: any, record: ReportItem) => {
+        return `${record.has_introduce_course_ratio}`
+      }
     }
   ]
 
   // 定义操作按钮
   const actions: TableAction<ReportItem>[] = [
     {
-      label: '查看',
+      label: '查看详情',
       onClick: (record) => {
-        console.log('查看报告:', record)
+        navigate({ to: '/admin/reports/$id', params: { id: record.id } })
       },
       className: 'text-blue-600 hover:text-blue-800'
     }

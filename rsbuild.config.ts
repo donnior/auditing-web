@@ -12,6 +12,7 @@ export default defineConfig({
       plugins: [
         tanstackRouter({
           target: 'react',
+          routeFileIgnorePattern: '_*.tsx',
           autoCodeSplitting: true,
           routeToken: '_layout',
         }),
@@ -21,6 +22,10 @@ export default defineConfig({
   server: {
     proxy: {
       '/xcauditing': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/auditing-api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
       },

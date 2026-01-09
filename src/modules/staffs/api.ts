@@ -8,22 +8,22 @@ import type { PageResponse } from '../common/types'
 
 
 export const getStaffs = async (): Promise<PageResponse<Staff>> => {
-  const response = await axios.get('/xcauditing/api/qwaccounts')
+  const response = await axios.get('/auditing-api/employees')
   return response.data
 }
 
 export const createStaff = async (staffData: CreateStaffData): Promise<Staff> => {
-  const response = await axios.post('/api/staffs', staffData)
+  const response = await axios.post('/auditing-api/employees', staffData)
   return response.data
 }
 
 export const updateStaff = async (id: string, staffData: UpdateStaffData): Promise<Staff> => {
-  const response = await axios.put(`/api/staffs/${id}`, staffData)
+  const response = await axios.put(`/auditing-api/employees/${id}`, staffData)
   return response.data
 }
 
 export const deleteStaff = async (id: string): Promise<void> => {
-  await axios.delete(`/api/staffs/${id}`)
+  await axios.delete(`/auditing-api/employees/${id}`)
 }
 
 // 员工API类型
@@ -33,7 +33,7 @@ export type UpdateStaffData = Partial<Omit<Staff, 'id' | 'createdAt'>>
 export interface Staff {
   id: string
   name: string
-  qwid: string
+  qw_id: string
   auto_analyze: boolean
   create_time: string
   update_time: string
