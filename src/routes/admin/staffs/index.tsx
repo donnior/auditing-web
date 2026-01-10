@@ -107,7 +107,7 @@ function RouteComponent() {
                 <tr key={staff.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-8 w-8">
+                      <div className="shrink-0 h-8 w-8">
                         <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
                           <span className="text-sm font-medium text-blue-600">
                             {staff.name.charAt(0)}
@@ -139,7 +139,8 @@ function RouteComponent() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center gap-2">
                       <Link
-                        to={'/admin/reports?staff='+`${staff.id}`}
+                        to="/admin/reports"
+                        search={{ employeeId: staff.id }}
                         className="text-blue-600 hover:text-blue-800"
                       >
                         查看报告

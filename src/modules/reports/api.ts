@@ -11,9 +11,9 @@ export const getReports = async (staffName?: string, employeeId?: string, evalPe
     params: {
       staffName: staffName || '',
       page_size: 100,
-      employeeId: '',
-      evalPeriod: '',
-      evalType: ''
+      employeeId: employeeId || '',
+      evalPeriod: evalPeriod || '',
+      evalType: evalType || ''
     }
   })
   return response.data
