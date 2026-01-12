@@ -147,7 +147,7 @@ function ReportsTable({
         columns={columns}
         actions={actions}
         loading={isLoading}
-        showCheckbox={true}
+        showCheckbox={false}
         rowKey="id"
         pagination={{
           current: currentPage,

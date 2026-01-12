@@ -9,11 +9,14 @@ import ReportsTable from './_components/ReportsTable'
 import { BackArrow } from '@/components/icons'
 import { useStaffs } from '@/modules/staffs/useStaffs'
 import { getRecentWeekPeriodOptions } from '@/lib/reportPeriods'
+import { EVAL_TYPE, type EvalType } from '@/constants'
+import { EVAL_TYPE_NAMES } from './_components/util'
 
 const searchSchema = z.object({
   staff: z.coerce.string().optional(),
   employeeId: z.coerce.string().optional(),
   evalPeriod: z.coerce.string().optional(),
+  evalType: z.coerce.string().optional(),
 })
 
 export const Route = createFileRoute('/admin/reports/')({
@@ -22,7 +25,7 @@ export const Route = createFileRoute('/admin/reports/')({
 })
 
 function RouteComponent() {
-  const { staff, employeeId, evalPeriod } = Route.useSearch()
+  const { staff, employeeId, evalPeriod, evalType } = Route.useSearch()
   const navigate = Route.useNavigate()
 
   // 兼容旧链接：/admin/reports?staff=<员工ID>
@@ -41,8 +44,8 @@ function RouteComponent() {
 
   // 使用React Query获取报告数据
   const { data, isLoading, error } = useQuery<PageResponse<WeeklyReportSummary>>({
-    queryKey: ['reports', effectiveEmployeeId, evalPeriod, currentPage, pageSize],
-    queryFn: () => getReports(undefined, effectiveEmployeeId, evalPeriod),
+    queryKey: ['reports', effectiveEmployeeId, evalPeriod, evalType, currentPage, pageSize],
+    queryFn: () => getReports(undefined, effectiveEmployeeId, evalPeriod, evalType),
   })
 
   return (
@@ -72,7 +75,7 @@ function RouteComponent() {
       </div>
 
       {/* 过滤项（block 排列） */}
-      <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <div className="text-sm font-medium text-gray-700 mb-2">报告周期</div>
           <select
@@ -85,6 +88,7 @@ function RouteComponent() {
                   staff,
                   employeeId,
                   evalPeriod: v ? v : undefined,
+                  evalType,
                 },
               })
             }}
@@ -109,6 +113,7 @@ function RouteComponent() {
               navigate({
                 search: {
                   evalPeriod,
+                  evalType,
                   employeeId: v ? v : undefined,
                 },
               })
@@ -118,6 +123,32 @@ function RouteComponent() {
             {staffs?.content?.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <div className="text-sm font-medium text-gray-700 mb-2">评估类型</div>
+          <select
+            className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-white"
+            value={evalType ?? ''}
+            onChange={(e) => {
+              const v = e.target.value
+              navigate({
+                search: {
+                  staff,
+                  employeeId,
+                  evalPeriod,
+                  evalType: v ? v : undefined,
+                },
+              })
+            }}
+          >
+            <option value="">全部</option>
+            {([EVAL_TYPE.FIRST_WEEK, EVAL_TYPE.SECOND_WEEK, EVAL_TYPE.THIRD_WEEK, EVAL_TYPE.FOURTH_WEEK] as EvalType[]).map((t) => (
+              <option key={t as string} value={t}>
+                {EVAL_TYPE_NAMES[t]}
               </option>
             ))}
           </select>

@@ -43,10 +43,10 @@ export function getRecentWeekPeriodOptions(weeks = 8, now = new Date()): WeekPer
       value: end,
       start,
       end,
-      label: `${toCompactYmd(start)} - ${toCompactYmd(end)}`,
+      // label: `${toCompactYmd(start)} - ${toCompactYmd(end)}`,
+      label: `${toCompactYmd(end)}`,
     })
   }
 
   return out
 }
-
