@@ -14,5 +14,5 @@ RUN bun run build
 FROM caddy:2.5.2
 WORKDIR /srv
 
-COPY --from=build /app/build /srv
+COPY --from=build /app/dist /srv
 COPY Caddyfile /etc/caddy/Caddyfile
