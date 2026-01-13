@@ -1,15 +1,27 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
+import { login } from '../../api/auth'
+import { normalizeRedirectPath, setStoredAuth } from '../../lib/auth'
 
 export const Route = createFileRoute('/_auth/login')({
   component: RouteComponent,
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      redirect: typeof search.redirect === 'string' ? search.redirect : undefined,
+    }
+  },
 })
 
 function RouteComponent() {
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: ''
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+
+  const navigate = useNavigate()
+  const search = Route.useSearch()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -19,10 +31,29 @@ function RouteComponent() {
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('登录信息:', formData)
-    // 这里可以添加登录逻辑
+    setErrorMsg(null)
+    setIsSubmitting(true)
+    try {
+      const token = await login({
+        username: formData.username,
+        password: formData.password,
+      })
+
+      setStoredAuth({
+        ...token,
+        username: formData.username,
+        expires_at: Date.now() + token.expires_in * 1000,
+      })
+
+      const redirectTo = normalizeRedirectPath(search.redirect) ?? '/admin/reports'
+      navigate({ to: redirectTo, replace: true })
+    } catch (err: any) {
+      setErrorMsg(err?.message || '登录失败，请稍后重试')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -38,20 +69,25 @@ function RouteComponent() {
 
           {/* 登录表单 */}
           <form onSubmit={handleSubmit} className="space-y-6">
+            {errorMsg ? (
+              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {errorMsg}
+              </div>
+            ) : null}
             {/* 邮箱输入框 */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                邮箱地址
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                用户名
               </label>
               <input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
+                id="username"
+                name="username"
+                type="text"
+                value={formData.username}
                 onChange={handleInputChange}
                 required
                 className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                placeholder="请输入您的邮箱"
+                placeholder="请输入您的用户名"
               />
             </div>
 
@@ -93,38 +129,20 @@ function RouteComponent() {
             {/* 登录按钮 */}
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              disabled={isSubmitting}
+              className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
-              登录
+              {isSubmitting ? '登录中...' : '登录'}
             </button>
           </form>
 
-
-          {/* <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500">或者</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-6 space-y-3">
-            <button className="w-full bg-gray-50 hover:bg-gray-100 text-gray-900 font-medium py-2 px-4 rounded-lg border border-gray-300 transition-all duration-200 flex items-center justify-center space-x-2">
-              <span>使用 Feishu 登录</span>
-            </button>
-          </div> */}
-
-          {/* 注册链接 */}
           <div className="mt-6 text-center">
-            <p className="text-gray-600">
+            {/* <p className="text-gray-600">
               还没有账户？{' '}
               <a href="#" className="text-blue-600 hover:text-blue-700 font-medium transition-colors">
                 立即注册
               </a>
-            </p>
+            </p> */}
           </div>
         </div>
       </div>
