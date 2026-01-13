@@ -12,7 +12,6 @@ export default defineConfig({
       plugins: [
         tanstackRouter({
           target: 'react',
-          routeFileIgnorePattern: '_*.tsx',
           autoCodeSplitting: true,
           routeToken: '_layout',
         }),
