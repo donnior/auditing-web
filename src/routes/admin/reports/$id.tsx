@@ -10,6 +10,96 @@ import { EVAL_TYPE, type EvalType } from '@/constants'
 import ReportItem from './_components/ReportItem'
 import { daysBefore, formatDateTime } from '@/lib/utils'
 
+function WeeklyReportDetailModal({
+  open,
+  title,
+  total,
+  items,
+  isLoading,
+  isError,
+  onClose,
+}: {
+  open: boolean
+  title: string
+  total: number
+  items: EvaluationDetail[]
+  isLoading: boolean
+  isError: boolean
+  onClose: () => void
+}) {
+  if (!open) return null
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/50 bg-opacity-50 transition-opacity"
+        onClick={onClose}
+      />
+      <div className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full mx-auto z-10">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <div>
+            <h3 className="text-lg font-medium text-gray-900">{title}详情</h3>
+            <p className="text-xs text-gray-500 mt-1">共 {total} 条</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-500 focus:outline-none"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div className="p-6">
+          {isLoading && (
+            <div className="text-sm text-gray-500">加载中...</div>
+          )}
+          {isError && (
+            <div className="text-sm text-red-500">加载失败，请稍后重试</div>
+          )}
+          {!isLoading && !isError && (
+            <div className="max-h-[60vh] overflow-auto border border-gray-100 rounded-lg">
+              {items.length === 0 ? (
+                <div className="text-sm text-gray-500 p-4">暂无详情数据</div>
+              ) : (
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        客户ID
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        评估时间
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        风险触发
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {items.map((item) => (
+                      <tr key={item.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-sm text-gray-900">{item.customer_id}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{formatDateTime(item.eval_time) || '-'}</td>
+                        <td className="px-4 py-3 text-sm">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${item.has_risk_word_trigger === 1 ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>
+                            {item.has_risk_word_trigger === 1 ? '是' : '否'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export const Route = createFileRoute('/admin/reports/$id')({
   loader: async ({ params }) => {
     const { id } = params
@@ -340,214 +430,18 @@ function RouteComponent() {
           </div>
         </>
       )}
-      {/* 核心指标卡片 */}
-      {/* <CustomAttributes report={report} /> */}
 
-      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">服务评级</h3>
-          {isReportCompleted ? (
-            <div className="flex items-center gap-4">
-              <span className={`text-2xl font-bold`}>
-                {report.report_rating}
-              </span>
-            </div>
-          ) : isReportFailed ? (
-            <div className="flex items-center justify-center h-16">
-              <div className="text-center">
-                <CrossIcon className="w-8 h-8 mx-auto text-red-400 mb-2" />
-                <p className="text-red-500 text-sm">生成失败</p>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center h-16">
-              <div className="animate-pulse bg-gray-200 h-4 w-full rounded"></div>
-              <span className="ml-4 text-sm text-gray-500">分析中...</span>
-            </div>
-          )}
-        </div>
-
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">服务评分</h3>
-          {isReportCompleted ? (
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <div className="flex justify-between text-sm text-gray-600 mb-2">
-                  <span>0</span>
-                  <span>10</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-green-600 h-2 rounded-full"
-                    style={{ width: `${(report.report_score / 10) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-              <span className={`text-2xl font-bold ${getScoreColor(report.report_score, 10)}`}>
-                {report.report_score}
-              </span>
-            </div>
-          ) : isReportFailed ? (
-            <div className="flex items-center justify-center h-16">
-              <div className="text-center">
-                <CrossIcon className="w-8 h-8 mx-auto text-red-400 mb-2" />
-                <p className="text-red-500 text-sm">生成失败</p>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center h-16">
-              <div className="animate-pulse bg-gray-200 h-4 w-full rounded"></div>
-              <span className="ml-4 text-sm text-gray-500">分析中...</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {isReportCompleted ? (
-        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">报告摘要</h3>
-          <div className="prose max-w-none text-gray-700 leading-relaxed">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {report.report_summary}
-            </ReactMarkdown>
-          </div>
-        </div>
-      ) : isReportFailed ? (
-        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">报告摘要</h3>
-          <div className="flex items-center justify-center h-24 bg-red-50 rounded-lg border-2 border-red-100">
-            <div className="text-center">
-              <AlertTriangleIcon className="w-8 h-8 mx-auto text-red-400 mb-2" />
-              <p className="text-red-600 text-sm font-medium">报告生成失败</p>
-              <p className="text-red-500 text-xs mt-1">请联系技术支持或重新生成</p>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">报告摘要</h3>
-          <div className="flex items-center justify-center h-24 bg-gray-50 rounded-lg">
-            <div className="text-center">
-              <SpinnerIcon className="w-8 h-8 mx-auto text-gray-400 mb-2 animate-spin" />
-              <p className="text-gray-500 text-sm">正在生成报告摘要...</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {isReportCompleted ? (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">改进建议</h3>
-          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
-            <div className="prose max-w-none text-gray-700 leading-relaxed">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {report.report_suggestions}
-              </ReactMarkdown>
-            </div>
-          </div>
-        </div>
-      ) : isReportFailed ? (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">改进建议</h3>
-          <div className="flex items-center justify-center h-24 bg-red-50 rounded-lg border-2 border-red-100">
-            <div className="text-center">
-              <AlertTriangleIcon className="w-8 h-8 mx-auto text-red-400 mb-2" />
-              <p className="text-red-600 text-sm font-medium">改进建议生成失败</p>
-              <p className="text-red-500 text-xs mt-1">请联系技术支持或重新生成</p>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">改进建议</h3>
-          <div className="flex items-center justify-center h-24 bg-gray-50 rounded-lg">
-            <div className="text-center">
-              <SpinnerIcon className="w-8 h-8 mx-auto text-gray-400 mb-2 animate-spin" />
-              <p className="text-gray-500 text-sm">正在生成改进建议...</p>
-            </div>
-          </div>
-        </div>
-      )} */}
-
-      {detailModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/50 bg-opacity-50 transition-opacity"
-            onClick={closeDetailModal}
-          />
-          <div className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full mx-auto z-10">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <div>
-                <h3 className="text-lg font-medium text-gray-900">{detailModal.title}详情</h3>
-                <p className="text-xs text-gray-500 mt-1">共 {detailQuery.data?.total_elements ?? detailItems.length} 条</p>
-              </div>
-              <button
-                type="button"
-                onClick={closeDetailModal}
-                className="text-gray-400 hover:text-gray-500 focus:outline-none"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <div className="p-6">
-              {detailQuery.isLoading && (
-                <div className="text-sm text-gray-500">加载中...</div>
-              )}
-              {detailQuery.isError && (
-                <div className="text-sm text-red-500">加载失败，请稍后重试</div>
-              )}
-              {!detailQuery.isLoading && !detailQuery.isError && (
-                <div className="max-h-[60vh] overflow-auto border border-gray-100 rounded-lg">
-                  {detailItems.length === 0 ? (
-                    <div className="text-sm text-gray-500 p-4">暂无详情数据</div>
-                  ) : (
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          {/* <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            客户名称
-                          </th> */}
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            客户ID
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            评估时间
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            风险触发
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {detailItems.map((item) => (
-                          <tr key={item.id} className="hover:bg-gray-50">
-                            {/* <td className="px-4 py-3 text-sm text-gray-900">{item.customer_name || '-'}</td> */}
-                            <td className="px-4 py-3 text-sm text-gray-900">{item.customer_id}</td>
-                            <td className="px-4 py-3 text-sm text-gray-900">{formatDateTime(item.eval_time) || '-'}</td>
-                            <td className="px-4 py-3 text-sm">
-                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${item.has_risk_word_trigger === 1 ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>
-                                {item.has_risk_word_trigger === 1 ? '是' : '否'}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <WeeklyReportDetailModal
+        open={!!detailModal}
+        title={detailModal?.title ?? ''}
+        total={(detailQuery.data?.total_elements ?? detailItems.length) as number}
+        items={detailItems}
+        isLoading={detailQuery.isLoading}
+        isError={detailQuery.isError}
+        onClose={closeDetailModal}
+      />
 
       <div className='mb-4'></div>
-
     </div>
-
-
-
   )
 }
