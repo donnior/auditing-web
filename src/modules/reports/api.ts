@@ -19,6 +19,16 @@ export const getReports = async (staffName?: string, employeeId?: string, evalPe
   return response.data
 }
 
+export const getWeeklyReportSummaryDetails = async (id: string, metric: string): Promise<PageResponse<EvaluationDetail>> => {
+  const response = await axios.get(`/auditing-api/weekly-report-summaries/${id}/details`, {
+    params: {
+      metric,
+      page_size: 200
+    }
+  })
+  return response.data
+}
+
 export const getCustomerReportsByAccountId = async (qwAccountId: string, cycleStartTime: string, cycleEndTime: string): Promise<PageResponse<CustomerReport>> => {
   const response = await axios.get('/xcauditing/api/employee-customer-reports', {
     params: {
@@ -51,6 +61,7 @@ export interface WeeklyReportSummary {
   employee_id: string
   employee_name: string
   employee_qw_id: string
+  generating_status?: 'PROCESSING' | 'COMPLETED' | 'FAILED'
   eval_time: string
   eval_period: string
   eval_type: string
@@ -70,6 +81,32 @@ export interface WeeklyReportSummary {
   total_week_material_send: number
   total_sunday_link_send: number
   total_risk_word_trigger: number
+}
+
+export interface EvaluationDetail {
+  id: string
+  employee_id: string
+  employee_qw_id: string
+  customer_id: string
+  customer_name: string
+  eval_time: string
+  eval_period: string
+  eval_type: string
+  has_introduce_teacher: number
+  has_introduce_course: number
+  has_introduce_schedule: number
+  has_introduce_course_time: number
+  has_order_check: number
+  has_material_send: number
+  has_course_remind: number
+  has_homework_publish: number
+  has_feedback_track: number
+  has_week_material_send: number
+  has_sunday_link_send: number
+  has_risk_word_trigger: number
+  chat_start_time: string
+  chat_end_time: string
+  biz_date: string
 }
 
 // 客户报告类型定义

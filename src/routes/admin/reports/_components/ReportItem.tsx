@@ -1,13 +1,31 @@
-import { createFileRoute } from '@tanstack/react-router'
+import type { FC } from 'react'
 
 
-const ReportItem = ({ title, value, total, isCompleted=true, isFailed=false }: { title: string, value: string | number, total?: number, isCompleted?: boolean, isFailed?: boolean }) => {
+export type ReportItemProps = {
+    title: string,
+    value: string | number,
+    total?: number,
+    isCompleted?: boolean,
+    isFailed?: boolean,
+    valueClassName?: string
+}
+
+const ReportItem: FC<ReportItemProps> = ({
+    title,
+    value,
+    total,
+    isCompleted = true,
+    isFailed = false,
+    valueClassName
+}) => {
     return <div className="bg-white rounded-lg border border-gray-200 p-6">
         <div className="flex items-center justify-between">
             <div>
                 <p className="text-sm font-medium text-gray-600">{title}</p>
                 {isCompleted ? (
-                    <p className="text-2xl font-bold text-gray-900">{value}</p>
+                    <p className={`text-2xl font-bold text-gray-900 ${valueClassName ? '' : ''}`}>
+                        <span className={valueClassName ?? ''}>{value}</span>
+                    </p>
                 ) : isFailed ? (
                     <div className="flex items-center">
                         <span className="text-xl font-bold text-red-500">--</span>
