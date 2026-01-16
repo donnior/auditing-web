@@ -8,7 +8,7 @@ import { type WeeklyReportSummary, type EvaluationDetail, getWeeklyReportSummary
 import { EVAL_TYPE, type EvalType } from '@/constants'
 
 import ReportItem from './_components/ReportItem'
-import { daysBefore,formatDate } from '@/lib/utils'
+import { daysBefore, formatDateTime } from '@/lib/utils'
 
 export const Route = createFileRoute('/admin/reports/$id')({
   loader: async ({ params }) => {
@@ -525,7 +525,7 @@ function RouteComponent() {
                           <tr key={item.id} className="hover:bg-gray-50">
                             {/* <td className="px-4 py-3 text-sm text-gray-900">{item.customer_name || '-'}</td> */}
                             <td className="px-4 py-3 text-sm text-gray-900">{item.customer_id}</td>
-                            <td className="px-4 py-3 text-sm text-gray-900">{item.eval_time || '-'}</td>
+                            <td className="px-4 py-3 text-sm text-gray-900">{formatDateTime(item.eval_time) || '-'}</td>
                             <td className="px-4 py-3 text-sm">
                               <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${item.has_risk_word_trigger === 1 ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>
                                 {item.has_risk_word_trigger === 1 ? '是' : '否'}

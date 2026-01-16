@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { getReports, type WeeklyReportSummary } from '@/modules/reports/api'
 import type { PageResponse } from '@/modules/common/types'
 import ReportsTable from './_components/ReportsTable'
+import ReportsSummary from './_components/ReportsSummary'
 import { BackArrow } from '@/components/icons'
 import { useStaffs } from '@/modules/staffs/useStaffs'
 import { getRecentWeekPeriodOptions } from '@/lib/reportPeriods'
@@ -47,6 +48,8 @@ function RouteComponent() {
     queryKey: ['reports', effectiveEmployeeId, evalPeriod, evalType, currentPage, pageSize],
     queryFn: () => getReports(undefined, effectiveEmployeeId, evalPeriod, evalType),
   })
+
+  const shouldShowSummary = Boolean(evalPeriod) && (data?.content?.length ?? 0) > 0
 
   return (
     <div>
@@ -154,6 +157,12 @@ function RouteComponent() {
           </select>
         </div>
       </div>
+
+
+
+      {shouldShowSummary && (
+        <ReportsSummary data={data?.content ?? []} evalPeriod={evalPeriod as string} />
+      )}
 
       {data?.content && <ReportsTable
         data={data?.content}

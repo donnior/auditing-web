@@ -282,7 +282,7 @@ export function Table<T = any>({
       {/* 分页器 */}
       {pagination && (
         <div className="flex items-center justify-between px-6 py-3 border-t border-gray-200">
-          <div className="text-sm text-gray-700">
+          <div className="text-sm text-gray-500">
             {pagination.showTotal
               ? pagination.showTotal(pagination.total, [
                   (pagination.current - 1) * pagination.pageSize + 1,
@@ -291,25 +291,27 @@ export function Table<T = any>({
               : `显示 ${(pagination.current - 1) * pagination.pageSize + 1} 到 ${Math.min(pagination.current * pagination.pageSize, pagination.total)} 条，共 ${pagination.total} 条记录`
             }
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              className="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={pagination.current <= 1}
-              onClick={() => pagination.onChange(pagination.current - 1, pagination.pageSize)}
-            >
-              上一页
-            </button>
-            <span className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md">
-              {pagination.current}
-            </span>
-            <button
-              className="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={pagination.current >= Math.ceil(pagination.total / pagination.pageSize)}
-              onClick={() => pagination.onChange(pagination.current + 1, pagination.pageSize)}
-            >
-              下一页
-            </button>
-          </div>
+          {Math.ceil(pagination.total / pagination.pageSize) > 1 && (
+            <div className="flex items-center gap-2">
+              <button
+                className="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={pagination.current <= 1}
+                onClick={() => pagination.onChange(pagination.current - 1, pagination.pageSize)}
+              >
+                上一页
+              </button>
+              <span className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md">
+                {pagination.current}
+              </span>
+              <button
+                className="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={pagination.current >= Math.ceil(pagination.total / pagination.pageSize)}
+                onClick={() => pagination.onChange(pagination.current + 1, pagination.pageSize)}
+              >
+                下一页
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
