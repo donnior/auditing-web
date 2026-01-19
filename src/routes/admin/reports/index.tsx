@@ -49,7 +49,12 @@ function RouteComponent() {
     queryFn: () => getReports(undefined, effectiveEmployeeId, evalPeriod, evalType),
   })
 
-  const shouldShowSummary = Boolean(evalPeriod) && (data?.content?.length ?? 0) > 0
+  // 列表过滤：隐藏「加微后48小时检测」类型
+  const filteredReports = useMemo(() => {
+    return (data?.content ?? []).filter((r) => r.eval_type !== EVAL_TYPE.WITHIN_48_HOURS)
+  }, [data?.content])
+
+  const shouldShowSummary = Boolean(evalPeriod) && filteredReports.length > 0
 
   return (
     <div>
@@ -71,7 +76,7 @@ function RouteComponent() {
           </h1>
           {effectiveEmployeeId && (
             <p className="text-sm text-gray-600 mt-1">
-              共找到 {data?.content?.length} 条报告记录
+              共找到 {filteredReports.length} 条报告记录
             </p>
           )}
         </div>
@@ -161,11 +166,11 @@ function RouteComponent() {
 
 
       {shouldShowSummary && (
-        <ReportsSummary data={data?.content ?? []} evalPeriod={evalPeriod as string} />
+        <ReportsSummary data={filteredReports} evalPeriod={evalPeriod as string} />
       )}
 
       {data?.content && <ReportsTable
-        data={data?.content}
+        data={filteredReports}
         isLoading={isLoading}
         error={error}
         currentPage={currentPage}
