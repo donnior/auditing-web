@@ -107,7 +107,7 @@ function ReportsTable({
     },
     {
       key: 'has_introduce_course_ratio',
-      label: '完全完成人数',
+      label: '全部完成人数',
       render: (value: any, record: ReportItem) => {
         return `${record.has_introduce_course_ratio}`
       }
