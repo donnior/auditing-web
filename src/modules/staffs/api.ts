@@ -35,6 +35,7 @@ export interface Staff {
   name: string
   qw_id: string
   auto_analyze: boolean
+  status: number
   create_time: string
   update_time: string
 }

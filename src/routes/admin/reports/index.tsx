@@ -163,8 +163,6 @@ function RouteComponent() {
         </div>
       </div>
 
-
-
       {shouldShowSummary && (
         <ReportsSummary data={filteredReports} evalPeriod={evalPeriod as string} />
       )}

@@ -57,8 +57,8 @@ function RouteComponent() {
   }
 
   return (
-    <div className=" flex items-center justify-center  from-gray-50 to-gray-100 px-4">
-      <div className="max-w-1/2 w-full space-y-8">
+    <div className="flex items-center justify-center  from-gray-50 to-gray-100 px-4">
+      <div className="sm:max-w-1/2 w-full space-y-8">
         {/* 登录表单容器 */}
         <div className="bg-white rounded-xl shadow-2xl p-8 border border-gray-200">
           {/* 头部标题 */}
