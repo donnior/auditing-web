@@ -73,7 +73,7 @@ function WeeklyReportDetailModal({
                         客户名称
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        评估时间
+                        添加时间
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         风险触发
@@ -85,7 +85,7 @@ function WeeklyReportDetailModal({
                       <tr key={item.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3 text-sm text-gray-900">{item.customer_id}</td>
                         <td className="px-4 py-3 text-sm text-gray-900">{item.card_user?.external_name || '-'}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{formatDateTime(item.eval_time) || '-'}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">{formatDateTime(item.card_user?.start_time) || '-'}</td>
                         <td className="px-4 py-3 text-sm">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${item.has_risk_word_trigger === 1 ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>
                             {item.has_risk_word_trigger === 1 ? '是' : '否'}
