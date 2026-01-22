@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { getReports, type WeeklyReportSummary } from '@/modules/reports/api'
 import type { PageResponse } from '@/modules/common/types'
 import ReportsTable from './_components/ReportsTable'
+import ReportsList from './_components/ReportsList'
 import ReportsSummary from './_components/ReportsSummary'
 import { BackArrow } from '@/components/icons'
 import { useStaffs } from '@/modules/staffs/useStaffs'
@@ -167,15 +168,33 @@ function RouteComponent() {
         <ReportsSummary data={filteredReports} evalPeriod={evalPeriod as string} />
       )}
 
-      {data?.content && <ReportsTable
-        data={filteredReports}
-        isLoading={isLoading}
-        error={error}
-        currentPage={currentPage}
-        pageSize={pageSize}
-        setCurrentPage={setCurrentPage}
-        setPageSize={setPageSize}
-      />}
+      {data?.content && (
+        <>
+          {/* sm 以下使用 List，sm 及以上使用 Table */}
+          <div className="sm:hidden">
+            <ReportsList
+              data={filteredReports}
+              isLoading={isLoading}
+              error={error}
+              currentPage={currentPage}
+              pageSize={pageSize}
+              setCurrentPage={setCurrentPage}
+              setPageSize={setPageSize}
+            />
+          </div>
+          <div className="hidden sm:block">
+            <ReportsTable
+              data={filteredReports}
+              isLoading={isLoading}
+              error={error}
+              currentPage={currentPage}
+              pageSize={pageSize}
+              setCurrentPage={setCurrentPage}
+              setPageSize={setPageSize}
+            />
+          </div>
+        </>
+      )}
     </div>
   )
 }

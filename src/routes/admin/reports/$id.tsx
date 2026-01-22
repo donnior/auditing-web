@@ -81,18 +81,23 @@ function WeeklyReportDetailModal({
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {items.map((item) => (
-                      <tr key={item.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm text-gray-900">{item.customer_id}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{item.card_user?.external_name || '-'}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{formatDateTime(item.card_user?.start_time) || '-'}</td>
-                        <td className="px-4 py-3 text-sm">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${item.has_risk_word_trigger === 1 ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>
-                            {item.has_risk_word_trigger === 1 ? '是' : '否'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                    {items.map((item) => {
+                      // 后端返回里可能包含 card_user，但类型定义未覆盖；这里做一次安全兜底，避免 TS 报错
+                      const cardUser = (item as any).card_user as { external_name?: string; start_time?: string } | undefined
+
+                      return (
+                        <tr key={item.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 text-sm text-gray-900">{item.customer_id}</td>
+                          <td className="px-4 py-3 text-sm text-gray-900">{cardUser?.external_name || '-'}</td>
+                          <td className="px-4 py-3 text-sm text-gray-900">{formatDateTime(cardUser?.start_time) || '-'}</td>
+                          <td className="px-4 py-3 text-sm">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${item.has_risk_word_trigger === 1 ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>
+                              {item.has_risk_word_trigger === 1 ? '是' : '否'}
+                            </span>
+                          </td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
               )}
@@ -285,18 +290,13 @@ function RouteComponent() {
 
       {/* 报告基本信息 */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-        <div className="flex justify-between items-start mb-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4">
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">{report.employee_name} 的质检报告</h2>
-            {/* <p className="text-gray-600">账号ID: {report.qw_account_id}</p> */}
           </div>
-          <div className="flex items-center gap-3">
-            {/* 生成状态 */}
-            <span className={`inline-flex items-center px-3 py-1 text-sm font-semibold rounded-full ${statusDisplay.color}`}>
-              {/* {statusDisplay.icon}
-              {statusDisplay.text} */}
-            </span>
-            {/* 只有已完成的报告才显示绩效评级 */}
+          <div className="flex items-center gap-3 w-full sm:w-auto sm:justify-end mt-2 sm:mt-0">
+            {/* <span className={`inline-flex items-center px-3 py-1 text-sm font-semibold rounded-full ${statusDisplay.color}`}>
+            </span> */}
             {isReportCompleted && (
               <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-red-400 text-white`}>
                 {EVAL_TYPE_NAMES[report.eval_type as EvalType]}
@@ -305,13 +305,7 @@ function RouteComponent() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          {/* <div>
-            <span className="text-gray-600">报告周期:</span>
-            <span className="ml-2 font-medium">
-              {formatDate(report.cycleStartTime)} - {formatDate(report.cycleEndTime)}
-            </span>
-          </div> */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm ">
           <div>
             <span className="text-gray-600">统计周期:</span>
             <span className="ml-2 font-medium border-gray-300 border rounded-full px-2 py-0.5">
@@ -319,7 +313,7 @@ function RouteComponent() {
             </span>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm mt-2">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm mt-3">
           <div>
             <span className="text-gray-600">用户数:</span>
             <button
@@ -377,7 +371,7 @@ function RouteComponent() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 mb-6 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 mb-6 gap-6">
         <DetailReportItem title="总客户数" value={report.total_customers} reportId={report.id} metric="totalCustomers" />
         <DetailReportItem title="介绍全部完成人数" value={report.total_introduce_completed} total={report.total_customers} reportId={report.id} metric="totalIntroduceCompleted" />
       </div>
@@ -385,7 +379,7 @@ function RouteComponent() {
         isFirstWeekReport(report) && v48hReport && (
           <>
             <div className="text-base text-gray-500 mb-2">加微后48小时检测</div>
-            <div className="grid grid-cols-3 mb-0 gap-6 bg-slate-200 p-4 rounded-t-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-3 mb-0 gap-6 bg-slate-200 p-4 rounded-t-lg">
               <DetailReportItem title="应检" value={v48hReport?.total_customers} reportId={v48hReport.id} metric="totalCustomers" />
               <DetailReportItem title="全部完成人数" value={v48hReport?.total_introduce_completed} total={v48hReport?.total_customers ?? 0} reportId={v48hReport.id} metric="totalIntroduceCompleted" />
               <DetailReportItem
@@ -396,7 +390,7 @@ function RouteComponent() {
                 mode="missingOrderCheck"
               />
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-6 bg-slate-200 p-4 rounded-b-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-6 bg-slate-200 p-4 rounded-b-lg">
               <DetailReportItem title="介绍课程总数" value={v48hReport?.total_introduce_course} total={v48hReport?.total_customers} reportId={v48hReport.id} metric="totalIntroduceCourse" />
               <DetailReportItem title="完成老师介绍人数" value={v48hReport?.total_introduce_teacher} total={v48hReport?.total_customers} reportId={v48hReport.id} metric="totalIntroduceTeacher" />
               <DetailReportItem title="完成课表介绍人数" value={v48hReport?.total_introduce_schedule} total={v48hReport?.total_customers} reportId={v48hReport.id} metric="totalIntroduceSchedule" />
@@ -410,7 +404,7 @@ function RouteComponent() {
         report.eval_type === 'WITHIN_48_HOURS' && (
           <>
             <div className="text-base text-gray-500 mb-2">介绍内容</div>
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-6 bg-slate-200 p-4 rounded-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-6 bg-slate-200 p-4 rounded-lg">
               <DetailReportItem title="介绍课程总数" value={report.total_introduce_course} total={report.total_customers} reportId={report.id} metric="totalIntroduceCourse" />
               <DetailReportItem title="完成老师介绍人数" value={report.total_introduce_teacher} total={report.total_customers} reportId={report.id} metric="totalIntroduceTeacher" />
               <DetailReportItem title="完成课表介绍人数" value={report.total_introduce_schedule} total={report.total_customers} reportId={report.id} metric="totalIntroduceSchedule" />
@@ -423,7 +417,7 @@ function RouteComponent() {
       {report.eval_type !== 'WITHIN_48_HOURS' && (
         <>
           <div className="text-base text-gray-500 mb-2">常规检查</div>
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-6 bg-slate-200 p-4 rounded-lg">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-6 bg-slate-200 p-4 rounded-lg">
             <DetailReportItem title="完成资料发送人数" value={report.total_material_send} total={report.total_customers} reportId={report.id} metric="totalMaterialSend" />
             <DetailReportItem title="完成到课提醒人数" value={report.total_course_remind} total={report.total_customers} reportId={report.id} metric="totalCourseRemind" />
             <DetailReportItem title="完成课后作业发布人数" value={report.total_homework_publish} total={report.total_customers} reportId={report.id} metric="totalHomeworkPublish" />

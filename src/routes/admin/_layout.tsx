@@ -12,14 +12,14 @@ const AdminLayout = () => {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <Link to="/admin/staffs" className="flex items-center mr-8">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-2">
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
                 <div className="text-xl font-bold text-gray-800">星灿AI质检系统</div>
               </Link>
-              <nav className="flex space-x-8">
+              <nav className="flex space-x-1 sm:space-x-4 md:space-x-8">
                 <Link to="/admin/staffs" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
                   员工
                 </Link>
@@ -28,7 +28,7 @@ const AdminLayout = () => {
                 </Link>
               </nav>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               {username ? (
                 <div className="text-sm font-medium text-gray-500">{username}</div>
               ) : null}
@@ -40,7 +40,7 @@ const AdminLayout = () => {
                   navigate({ to: '/login', replace: true, search: { redirect: undefined } })
                 }}
               >
-                退出登录
+                退出
               </button>
             </div>
           </div>
