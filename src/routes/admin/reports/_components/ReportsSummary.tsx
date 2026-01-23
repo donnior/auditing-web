@@ -75,7 +75,7 @@ function ReportsSummary({ data, evalPeriod }: ReportsSummaryProps) {
           <div className="mt-1 text-xl font-semibold text-gray-900">{totals.weekMaterialSend}</div>
         </div>
         <div className="rounded-lg border border-gray-200 px-4 py-3">
-          <div className="text-xs text-gray-500">发送周日蟹蟹销转链接人数</div>
+          <div className="text-xs text-gray-500">发送周日螳螂销转链接人数</div>
           <div className="mt-1 text-xl font-semibold text-gray-900">{totals.sundayLinkSend}</div>
         </div>
       </div>
