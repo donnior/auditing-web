@@ -19,8 +19,10 @@ import { Route as AdminSlowPageRouteImport } from './routes/admin/slow-page'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AdminStaffsIndexRouteImport } from './routes/admin/staffs/index'
 import { Route as AdminReportsIndexRouteImport } from './routes/admin/reports/index'
+import { Route as AdminGroupsIndexRouteImport } from './routes/admin/groups/index'
 import { Route as UserProjectsIndexRouteImport } from './routes/_user/projects/index'
 import { Route as AdminReportsIdRouteImport } from './routes/admin/reports/$id'
+import { Route as AdminGroupsIdRouteImport } from './routes/admin/groups/$id'
 import { Route as AdminChatSessionIdRouteImport } from './routes/admin/chat/$sessionId'
 import { Route as UserProjectsList2RouteImport } from './routes/_user/projects/list2'
 import { Route as UserProjectsIdRouteImport } from './routes/_user/projects/$id'
@@ -74,6 +76,11 @@ const AdminReportsIndexRoute = AdminReportsIndexRouteImport.update({
   path: '/reports/',
   getParentRoute: () => AdminLayoutRoute,
 } as any)
+const AdminGroupsIndexRoute = AdminGroupsIndexRouteImport.update({
+  id: '/groups/',
+  path: '/groups/',
+  getParentRoute: () => AdminLayoutRoute,
+} as any)
 const UserProjectsIndexRoute = UserProjectsIndexRouteImport.update({
   id: '/projects/',
   path: '/projects/',
@@ -82,6 +89,11 @@ const UserProjectsIndexRoute = UserProjectsIndexRouteImport.update({
 const AdminReportsIdRoute = AdminReportsIdRouteImport.update({
   id: '/reports/$id',
   path: '/reports/$id',
+  getParentRoute: () => AdminLayoutRoute,
+} as any)
+const AdminGroupsIdRoute = AdminGroupsIdRouteImport.update({
+  id: '/groups/$id',
+  path: '/groups/$id',
   getParentRoute: () => AdminLayoutRoute,
 } as any)
 const AdminChatSessionIdRoute = AdminChatSessionIdRouteImport.update({
@@ -115,8 +127,10 @@ export interface FileRoutesByFullPath {
   '/projects/$id': typeof UserProjectsIdRoute
   '/projects/list2': typeof UserProjectsList2Route
   '/admin/chat/$sessionId': typeof AdminChatSessionIdRoute
+  '/admin/groups/$id': typeof AdminGroupsIdRoute
   '/admin/reports/$id': typeof AdminReportsIdRoute
   '/projects': typeof UserProjectsIndexRoute
+  '/admin/groups': typeof AdminGroupsIndexRoute
   '/admin/reports': typeof AdminReportsIndexRoute
   '/admin/staffs': typeof AdminStaffsIndexRoute
   '/projects/$id/members': typeof UserProjectsIdMembersRoute
@@ -130,8 +144,10 @@ export interface FileRoutesByTo {
   '/projects/$id': typeof UserProjectsIdRoute
   '/projects/list2': typeof UserProjectsList2Route
   '/admin/chat/$sessionId': typeof AdminChatSessionIdRoute
+  '/admin/groups/$id': typeof AdminGroupsIdRoute
   '/admin/reports/$id': typeof AdminReportsIdRoute
   '/projects': typeof UserProjectsIndexRoute
+  '/admin/groups': typeof AdminGroupsIndexRoute
   '/admin/reports': typeof AdminReportsIndexRoute
   '/admin/staffs': typeof AdminStaffsIndexRoute
   '/projects/$id/members': typeof UserProjectsIdMembersRoute
@@ -149,8 +165,10 @@ export interface FileRoutesById {
   '/_user/projects/$id': typeof UserProjectsIdRoute
   '/_user/projects/list2': typeof UserProjectsList2Route
   '/admin/chat/$sessionId': typeof AdminChatSessionIdRoute
+  '/admin/groups/$id': typeof AdminGroupsIdRoute
   '/admin/reports/$id': typeof AdminReportsIdRoute
   '/_user/projects/': typeof UserProjectsIndexRoute
+  '/admin/groups/': typeof AdminGroupsIndexRoute
   '/admin/reports/': typeof AdminReportsIndexRoute
   '/admin/staffs/': typeof AdminStaffsIndexRoute
   '/_user/projects_/$id/members': typeof UserProjectsIdMembersRoute
@@ -167,8 +185,10 @@ export interface FileRouteTypes {
     | '/projects/$id'
     | '/projects/list2'
     | '/admin/chat/$sessionId'
+    | '/admin/groups/$id'
     | '/admin/reports/$id'
     | '/projects'
+    | '/admin/groups'
     | '/admin/reports'
     | '/admin/staffs'
     | '/projects/$id/members'
@@ -182,8 +202,10 @@ export interface FileRouteTypes {
     | '/projects/$id'
     | '/projects/list2'
     | '/admin/chat/$sessionId'
+    | '/admin/groups/$id'
     | '/admin/reports/$id'
     | '/projects'
+    | '/admin/groups'
     | '/admin/reports'
     | '/admin/staffs'
     | '/projects/$id/members'
@@ -200,8 +222,10 @@ export interface FileRouteTypes {
     | '/_user/projects/$id'
     | '/_user/projects/list2'
     | '/admin/chat/$sessionId'
+    | '/admin/groups/$id'
     | '/admin/reports/$id'
     | '/_user/projects/'
+    | '/admin/groups/'
     | '/admin/reports/'
     | '/admin/staffs/'
     | '/_user/projects_/$id/members'
@@ -287,6 +311,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminReportsIndexRouteImport
       parentRoute: typeof AdminLayoutRoute
     }
+    '/admin/groups/': {
+      id: '/admin/groups/'
+      path: '/groups'
+      fullPath: '/admin/groups'
+      preLoaderRoute: typeof AdminGroupsIndexRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
     '/_user/projects/': {
       id: '/_user/projects/'
       path: '/projects'
@@ -299,6 +330,13 @@ declare module '@tanstack/react-router' {
       path: '/reports/$id'
       fullPath: '/admin/reports/$id'
       preLoaderRoute: typeof AdminReportsIdRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
+    '/admin/groups/$id': {
+      id: '/admin/groups/$id'
+      path: '/groups/$id'
+      fullPath: '/admin/groups/$id'
+      preLoaderRoute: typeof AdminGroupsIdRouteImport
       parentRoute: typeof AdminLayoutRoute
     }
     '/admin/chat/$sessionId': {
@@ -366,7 +404,9 @@ interface AdminLayoutRouteChildren {
   AdminSlowPageRoute: typeof AdminSlowPageRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminChatSessionIdRoute: typeof AdminChatSessionIdRoute
+  AdminGroupsIdRoute: typeof AdminGroupsIdRoute
   AdminReportsIdRoute: typeof AdminReportsIdRoute
+  AdminGroupsIndexRoute: typeof AdminGroupsIndexRoute
   AdminReportsIndexRoute: typeof AdminReportsIndexRoute
   AdminStaffsIndexRoute: typeof AdminStaffsIndexRoute
 }
@@ -375,7 +415,9 @@ const AdminLayoutRouteChildren: AdminLayoutRouteChildren = {
   AdminSlowPageRoute: AdminSlowPageRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminChatSessionIdRoute: AdminChatSessionIdRoute,
+  AdminGroupsIdRoute: AdminGroupsIdRoute,
   AdminReportsIdRoute: AdminReportsIdRoute,
+  AdminGroupsIndexRoute: AdminGroupsIndexRoute,
   AdminReportsIndexRoute: AdminReportsIndexRoute,
   AdminStaffsIndexRoute: AdminStaffsIndexRoute,
 }

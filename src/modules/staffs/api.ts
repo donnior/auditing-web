@@ -27,8 +27,8 @@ export const deleteStaff = async (id: string): Promise<void> => {
 }
 
 // 员工API类型
-export type CreateStaffData = Omit<Staff, 'id' | 'createdAt' | 'updatedAt'>
-export type UpdateStaffData = Partial<Omit<Staff, 'id' | 'createdAt'>>
+export type CreateStaffData = Omit<Staff, 'id' | 'createdAt' | 'updatedAt' | 'group_id' | 'group_name'>
+export type UpdateStaffData = Partial<Omit<Staff, 'id' | 'createdAt' | 'group_name'>>
 // 员工类型定义
 export interface Staff {
   id: string
@@ -38,4 +38,6 @@ export interface Staff {
   status: number
   create_time: string
   update_time: string
+  group_id: string | null
+  group_name: string | null
 }

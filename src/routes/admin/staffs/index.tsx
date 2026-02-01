@@ -85,6 +85,9 @@ function RouteComponent() {
                 企微ID
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                所属分组
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 自动生成报告
               </th>
               {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -98,7 +101,7 @@ function RouteComponent() {
           <tbody className="bg-white divide-y divide-gray-200">
             {staffs?.content?.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                   暂无员工数据
                 </td>
               </tr>
@@ -123,6 +126,21 @@ function RouteComponent() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {staff.qw_id}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {staff.group_name ? (
+                      <Link
+                        to="/admin/groups/$id"
+                        params={{ id: staff.group_id! }}
+                        className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 hover:bg-blue-200"
+                      >
+                        {staff.group_name}
+                      </Link>
+                    ) : (
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-500">
+                        未分组
+                      </span>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
