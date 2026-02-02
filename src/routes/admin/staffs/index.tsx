@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
-import { useStaffs, useCreateStaff, useUpdateStaff, useDeleteStaff } from '@/modules/staffs/useStaffs'
+import { useStaffs, useCreateStaff, useUpdateStaff, useDeleteStaff, useAssignAccount, useRemoveAccount, useAvailableAccounts } from '@/modules/staffs/useStaffs'
 import { StaffModal } from '@/components/StaffModal'
+import { AssignAccountModal } from '@/components/AssignAccountModal'
 import type { Staff, CreateStaffData } from '@/modules/staffs/api'
 
 export const Route = createFileRoute('/admin/staffs/')({
@@ -13,9 +14,14 @@ function RouteComponent() {
   const { createStaffMutation, isCreating } = useCreateStaff()
   const { updateStaffMutation, isUpdating } = useUpdateStaff()
   const { deleteStaffMutation, isDeleting } = useDeleteStaff()
+  const { assignAccountMutation, isAssigning } = useAssignAccount()
+  const { removeAccountMutation, isRemoving } = useRemoveAccount()
+  const { accounts: availableAccounts, refetch: refetchAccounts } = useAvailableAccounts()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null)
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
+  const [isAssignAccountModalOpen, setIsAssignAccountModalOpen] = useState(false)
+  const [assigningStaff, setAssigningStaff] = useState<Staff | null>(null)
 
   const handleSubmitStaff = async (data: CreateStaffData) => {
     if (modalMode === 'edit' && editingStaff) {
@@ -47,6 +53,29 @@ function RouteComponent() {
     if (window.confirm(`确定要删除员工"${name}"吗？`)) {
       await deleteStaffMutation(id)
     }
+  }
+
+  const handleOpenAssignAccount = (staff: Staff) => {
+    setAssigningStaff(staff)
+    refetchAccounts()
+    setIsAssignAccountModalOpen(true)
+  }
+
+  const handleAssignAccount = async (accountUserId: string) => {
+    if (assigningStaff) {
+      await assignAccountMutation({ employeeId: assigningStaff.id, accountUserId })
+    }
+  }
+
+  const handleRemoveAccount = async (staff: Staff) => {
+    if (window.confirm(`确定要解除员工"${staff.name}"的登录账户"${staff.account_username}"吗？`)) {
+      await removeAccountMutation(staff.id)
+    }
+  }
+
+  const handleCloseAssignAccountModal = () => {
+    setIsAssignAccountModalOpen(false)
+    setAssigningStaff(null)
   }
 
   if (isLoading) {
@@ -88,6 +117,9 @@ function RouteComponent() {
                 所属分组
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                登录账户
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 自动生成报告
               </th>
               {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -101,7 +133,7 @@ function RouteComponent() {
           <tbody className="bg-white divide-y divide-gray-200">
             {staffs?.content?.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
                   暂无员工数据
                 </td>
               </tr>
@@ -140,6 +172,35 @@ function RouteComponent() {
                       <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-500">
                         未分组
                       </span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {staff.account_username ? (
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                          {staff.account_username}
+                        </span>
+                        <button
+                          onClick={() => handleRemoveAccount(staff)}
+                          disabled={isRemoving}
+                          className="text-gray-400 hover:text-red-600 disabled:opacity-50"
+                          title="解除绑定"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleOpenAssignAccount(staff)}
+                        className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 border border-blue-300 rounded-full hover:bg-blue-50"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        分配账户
+                      </button>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -200,6 +261,16 @@ function RouteComponent() {
         isLoading={modalMode === 'edit' ? isUpdating : isCreating}
         editingStaff={editingStaff}
         mode={modalMode}
+      />
+
+      {/* 分配账户 Modal */}
+      <AssignAccountModal
+        isOpen={isAssignAccountModalOpen}
+        onClose={handleCloseAssignAccountModal}
+        onSubmit={handleAssignAccount}
+        isLoading={isAssigning}
+        availableAccounts={availableAccounts || []}
+        employeeName={assigningStaff?.name || ''}
       />
     </div>
   )

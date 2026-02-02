@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { getStaffs, createStaff, updateStaff, deleteStaff } from './api'
+import { getStaffs, createStaff, updateStaff, deleteStaff, assignAccount, removeAccount, getAvailableAccounts } from './api'
 import type { Staff, CreateStaffData, UpdateStaffData } from '@/modules/staffs/api'
 
 // 获取员工列表
@@ -54,4 +54,45 @@ export const useDeleteStaff = () => {
   })
 
   return { deleteStaffMutation, isDeleting }
+}
+
+// 分配登录账户
+export const useAssignAccount = () => {
+  const queryClient = useQueryClient()
+
+  const { mutateAsync: assignAccountMutation, isPending: isAssigning } = useMutation({
+    mutationFn: ({ employeeId, accountUserId }: { employeeId: string; accountUserId: string }) =>
+      assignAccount(employeeId, accountUserId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['staffs'] })
+      queryClient.invalidateQueries({ queryKey: ['available-accounts'] })
+    },
+  })
+
+  return { assignAccountMutation, isAssigning }
+}
+
+// 解除登录账户
+export const useRemoveAccount = () => {
+  const queryClient = useQueryClient()
+
+  const { mutateAsync: removeAccountMutation, isPending: isRemoving } = useMutation({
+    mutationFn: removeAccount,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['staffs'] })
+      queryClient.invalidateQueries({ queryKey: ['available-accounts'] })
+    },
+  })
+
+  return { removeAccountMutation, isRemoving }
+}
+
+// 获取可分配的账户列表
+export const useAvailableAccounts = () => {
+  const { data: accounts, isLoading, error, refetch } = useQuery({
+    queryKey: ['available-accounts'],
+    queryFn: getAvailableAccounts,
+  })
+
+  return { accounts, isLoading, error, refetch }
 }
