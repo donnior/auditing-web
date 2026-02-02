@@ -29,6 +29,26 @@ export const getWeeklyReportSummaryDetails = async (id: string, metric: string):
   return response.data
 }
 
+// 聊天记录相关
+export interface ChatMessage {
+  msg_id: string
+  from_id: string
+  from_name: string
+  accept_id: string
+  accept_type: number
+  accept_name: string
+  msg_type: string
+  content: string
+  data_seq: number
+  msg_time: string
+  create_time: string
+}
+
+export const getEvaluationDetailChatMessages = async (evaluationDetailId: string): Promise<ChatMessage[]> => {
+  const response = await axios.get(`/auditing-api/evaluation-details/${evaluationDetailId}/chat-messages`)
+  return response.data
+}
+
 export const getCustomerReportsByAccountId = async (qwAccountId: string, cycleStartTime: string, cycleEndTime: string): Promise<PageResponse<CustomerReport>> => {
   const response = await axios.get('/xcauditing/api/employee-customer-reports', {
     params: {
@@ -127,3 +147,6 @@ export interface CustomerReport {
   service_quality_score: number
   create_time: string
 }
+
+// 显式导出（避免某些工具链解析不到）
+export type { ChatMessage }

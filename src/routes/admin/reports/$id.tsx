@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react'
+import axios from 'axios'
 
 import { CheckIcon, SpinnerIcon, CrossIcon, BackArrow } from '@/components/icons'
 
@@ -9,6 +10,117 @@ import { EVAL_TYPE, type EvalType } from '@/constants'
 
 import ReportItem from './_components/ReportItem'
 import { daysBefore, formatDateTime } from '@/lib/utils'
+
+type ChatMessage = {
+  msg_id: string
+  from_id: string
+  from_name: string
+  accept_id: string
+  accept_type: number
+  accept_name: string
+  msg_type: string
+  content: string
+  data_seq: number
+  msg_time: string
+  create_time: string
+}
+
+async function getEvaluationDetailChatMessages(evaluationDetailId: string): Promise<ChatMessage[]> {
+  const response = await axios.get(`/auditing-api/evaluation-details/${evaluationDetailId}/chat-messages`)
+  return response.data
+}
+
+function ChatMessagesModal({
+  open,
+  title,
+  customerId,
+  items,
+  isLoading,
+  isError,
+  onClose,
+}: {
+  open: boolean
+  title: string
+  customerId: string
+  items: ChatMessage[]
+  isLoading: boolean
+  isError: boolean
+  onClose: () => void
+}) {
+  if (!open) return null
+
+  return (
+    <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/50 bg-opacity-50 transition-opacity"
+        onClick={onClose}
+      />
+      <div className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full mx-auto z-10">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <div>
+            <h3 className="text-lg font-medium text-gray-900">{title}</h3>
+            <p className="text-xs text-gray-500 mt-1">共 {items.length} 条</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-500 focus:outline-none"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div className="p-6">
+          {isLoading && (
+            <div className="text-sm text-gray-500">加载中...</div>
+          )}
+          {isError && (
+            <div className="text-sm text-red-500">加载失败，请稍后重试</div>
+          )}
+          {!isLoading && !isError && (
+            <div className="max-h-[60vh] overflow-auto border border-gray-100 rounded-lg">
+              {items.length === 0 ? (
+                <div className="text-sm text-gray-500 p-4">暂无聊天记录</div>
+              ) : (
+                <ul className="p-4 space-y-3 bg-gray-50">
+                  {items.map((m) => {
+                    const isCustomer = m.from_id === customerId
+                    const sender = isCustomer ? '客户' : '员工'
+                    const timeText = formatDateTime(m.msg_time) || m.msg_time
+
+                    return (
+                      <li key={m.msg_id} className={`flex ${isCustomer ? 'justify-start' : 'justify-end'}`}>
+                        <div className={`max-w-[85%] rounded-lg px-3 py-2 shadow-sm ${isCustomer ? 'bg-blue-500 text-white' : 'bg-white border border-gray-200 text-gray-900'}`}>
+                          <div className={`flex items-baseline gap-2 ${isCustomer ? 'justify-start' : 'justify-end'}`}>
+                            <div className={`text-xs font-medium ${isCustomer ? 'text-blue-100' : 'text-gray-600'}`}>
+                              {sender} · {m.from_name || m.from_id}
+                            </div>
+                            <div className={`text-[11px] ${isCustomer ? 'text-blue-100/80' : 'text-gray-400'}`}>
+                              {timeText}
+                            </div>
+                          </div>
+                          <div className={`mt-1 text-sm whitespace-pre-wrap wrap-break-word ${isCustomer ? 'text-white' : 'text-gray-900'}`}>
+                            {m.content || '-'}
+                          </div>
+                          {m.msg_type && (
+                            <div className={`mt-1 text-[11px] ${isCustomer ? 'text-blue-100/80' : 'text-gray-400'}`}>
+                              类型：{m.msg_type}
+                            </div>
+                          )}
+                        </div>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function WeeklyReportDetailModal({
   open,
@@ -27,6 +139,17 @@ function WeeklyReportDetailModal({
   isError: boolean
   onClose: () => void
 }) {
+  const [chatModal, setChatModal] = useState<{ evaluationDetailId: string; customerId: string; title: string } | null>(null)
+
+  const chatQuery = useQuery({
+    queryKey: ['evaluationDetailChatMessages', chatModal?.evaluationDetailId],
+    queryFn: async () => {
+      if (!chatModal) return []
+      return getEvaluationDetailChatMessages(chatModal.evaluationDetailId)
+    },
+    enabled: !!chatModal,
+  })
+
   if (!open) return null
 
   return (
@@ -66,9 +189,9 @@ function WeeklyReportDetailModal({
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {/* <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         客户ID
-                      </th>
+                      </th> */}
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         客户名称
                       </th>
@@ -81,24 +204,39 @@ function WeeklyReportDetailModal({
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         风险词
                       </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        查看对话记录
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {items.map((item) => {
                       // 后端返回里可能包含 card_user，但类型定义未覆盖；这里做一次安全兜底，避免 TS 报错
                       const cardUser = (item as any).card_user as { external_name?: string; start_time?: string } | undefined
+                      const customerLabel = cardUser?.external_name || item.customer_name || item.customer_id
 
                       return (
                         <tr key={item.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-3 text-sm text-gray-900">{item.customer_id}</td>
+                          {/* <td className="px-4 py-3 text-sm text-gray-900">{item.customer_id}</td> */}
                           <td className="px-4 py-3 text-sm text-gray-900">{cardUser?.external_name || '-'}</td>
-                          <td className="px-4 py-3 text-sm text-gray-900">{formatDateTime(cardUser?.start_time) || '-'}</td>
+                          <td className="px-4 py-3 text-sm text-gray-900">
+                            {cardUser?.start_time ? (formatDateTime(cardUser.start_time) || '-') : '-'}
+                          </td>
                           <td className="px-4 py-3 text-sm">
                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${item.has_risk_word_trigger === 1 ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>
                               {item.has_risk_word_trigger === 1 ? '是' : '否'}
                             </span>
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-900">{item.risk_words}</td>
+                          <td className="px-4 py-3 text-sm">
+                            <button
+                              type="button"
+                              className="text-blue-600 hover:text-blue-800"
+                              onClick={() => setChatModal({ evaluationDetailId: item.id, customerId: item.customer_id, title: `与 ${customerLabel} 的对话记录` })}
+                            >
+                              查看对话记录
+                            </button>
+                          </td>
                         </tr>
                       )
                     })}
@@ -109,6 +247,16 @@ function WeeklyReportDetailModal({
           )}
         </div>
       </div>
+
+      <ChatMessagesModal
+        open={!!chatModal}
+        title={chatModal?.title ?? '对话记录'}
+        customerId={chatModal?.customerId ?? ''}
+        items={chatQuery.data ?? []}
+        isLoading={chatQuery.isLoading}
+        isError={chatQuery.isError}
+        onClose={() => setChatModal(null)}
+      />
     </div>
   )
 }
