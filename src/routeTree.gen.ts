@@ -20,6 +20,7 @@ import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AdminStaffsIndexRouteImport } from './routes/admin/staffs/index'
 import { Route as AdminReportsIndexRouteImport } from './routes/admin/reports/index'
 import { Route as AdminGroupsIndexRouteImport } from './routes/admin/groups/index'
+import { Route as AdminAccountsIndexRouteImport } from './routes/admin/accounts/index'
 import { Route as UserProjectsIndexRouteImport } from './routes/_user/projects/index'
 import { Route as AdminReportsIdRouteImport } from './routes/admin/reports/$id'
 import { Route as AdminGroupsIdRouteImport } from './routes/admin/groups/$id'
@@ -81,6 +82,11 @@ const AdminGroupsIndexRoute = AdminGroupsIndexRouteImport.update({
   path: '/groups/',
   getParentRoute: () => AdminLayoutRoute,
 } as any)
+const AdminAccountsIndexRoute = AdminAccountsIndexRouteImport.update({
+  id: '/accounts/',
+  path: '/accounts/',
+  getParentRoute: () => AdminLayoutRoute,
+} as any)
 const UserProjectsIndexRoute = UserProjectsIndexRouteImport.update({
   id: '/projects/',
   path: '/projects/',
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/admin/groups/$id': typeof AdminGroupsIdRoute
   '/admin/reports/$id': typeof AdminReportsIdRoute
   '/projects': typeof UserProjectsIndexRoute
+  '/admin/accounts': typeof AdminAccountsIndexRoute
   '/admin/groups': typeof AdminGroupsIndexRoute
   '/admin/reports': typeof AdminReportsIndexRoute
   '/admin/staffs': typeof AdminStaffsIndexRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/admin/groups/$id': typeof AdminGroupsIdRoute
   '/admin/reports/$id': typeof AdminReportsIdRoute
   '/projects': typeof UserProjectsIndexRoute
+  '/admin/accounts': typeof AdminAccountsIndexRoute
   '/admin/groups': typeof AdminGroupsIndexRoute
   '/admin/reports': typeof AdminReportsIndexRoute
   '/admin/staffs': typeof AdminStaffsIndexRoute
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/admin/groups/$id': typeof AdminGroupsIdRoute
   '/admin/reports/$id': typeof AdminReportsIdRoute
   '/_user/projects/': typeof UserProjectsIndexRoute
+  '/admin/accounts/': typeof AdminAccountsIndexRoute
   '/admin/groups/': typeof AdminGroupsIndexRoute
   '/admin/reports/': typeof AdminReportsIndexRoute
   '/admin/staffs/': typeof AdminStaffsIndexRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/admin/groups/$id'
     | '/admin/reports/$id'
     | '/projects'
+    | '/admin/accounts'
     | '/admin/groups'
     | '/admin/reports'
     | '/admin/staffs'
@@ -205,6 +215,7 @@ export interface FileRouteTypes {
     | '/admin/groups/$id'
     | '/admin/reports/$id'
     | '/projects'
+    | '/admin/accounts'
     | '/admin/groups'
     | '/admin/reports'
     | '/admin/staffs'
@@ -225,6 +236,7 @@ export interface FileRouteTypes {
     | '/admin/groups/$id'
     | '/admin/reports/$id'
     | '/_user/projects/'
+    | '/admin/accounts/'
     | '/admin/groups/'
     | '/admin/reports/'
     | '/admin/staffs/'
@@ -318,6 +330,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGroupsIndexRouteImport
       parentRoute: typeof AdminLayoutRoute
     }
+    '/admin/accounts/': {
+      id: '/admin/accounts/'
+      path: '/accounts'
+      fullPath: '/admin/accounts'
+      preLoaderRoute: typeof AdminAccountsIndexRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
     '/_user/projects/': {
       id: '/_user/projects/'
       path: '/projects'
@@ -406,6 +425,7 @@ interface AdminLayoutRouteChildren {
   AdminChatSessionIdRoute: typeof AdminChatSessionIdRoute
   AdminGroupsIdRoute: typeof AdminGroupsIdRoute
   AdminReportsIdRoute: typeof AdminReportsIdRoute
+  AdminAccountsIndexRoute: typeof AdminAccountsIndexRoute
   AdminGroupsIndexRoute: typeof AdminGroupsIndexRoute
   AdminReportsIndexRoute: typeof AdminReportsIndexRoute
   AdminStaffsIndexRoute: typeof AdminStaffsIndexRoute
@@ -417,6 +437,7 @@ const AdminLayoutRouteChildren: AdminLayoutRouteChildren = {
   AdminChatSessionIdRoute: AdminChatSessionIdRoute,
   AdminGroupsIdRoute: AdminGroupsIdRoute,
   AdminReportsIdRoute: AdminReportsIdRoute,
+  AdminAccountsIndexRoute: AdminAccountsIndexRoute,
   AdminGroupsIndexRoute: AdminGroupsIndexRoute,
   AdminReportsIndexRoute: AdminReportsIndexRoute,
   AdminStaffsIndexRoute: AdminStaffsIndexRoute,
