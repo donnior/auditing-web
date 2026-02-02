@@ -78,6 +78,9 @@ function WeeklyReportDetailModal({
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         风险触发
                       </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        风险词
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -95,6 +98,7 @@ function WeeklyReportDetailModal({
                               {item.has_risk_word_trigger === 1 ? '是' : '否'}
                             </span>
                           </td>
+                          <td className="px-4 py-3 text-sm text-gray-900">{item.risk_words}</td>
                         </tr>
                       )
                     })}

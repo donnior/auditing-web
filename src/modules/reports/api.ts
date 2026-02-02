@@ -107,6 +107,7 @@ export interface EvaluationDetail {
   chat_start_time: string
   chat_end_time: string
   biz_date: string
+  risk_words: string
 }
 
 // 客户报告类型定义
