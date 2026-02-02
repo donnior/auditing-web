@@ -1,3 +1,11 @@
+// 账户类型常量
+export const ACCOUNT_TYPE = {
+  ADMIN: 1,
+  EMPLOYEE: 2,
+} as const
+
+export type AccountType = typeof ACCOUNT_TYPE[keyof typeof ACCOUNT_TYPE]
+
 export type AuthToken = {
   token: string
   token_type: string
@@ -7,6 +15,7 @@ export type AuthToken = {
    */
   expires_at?: number
   username?: string
+  account_type?: number
 }
 
 const AUTH_STORAGE_KEY = 'xcauditing.auth'
@@ -87,6 +96,25 @@ export function getAuthedUsername(): string | undefined {
   const payload = getJwtPayload(auth.token)
   const sub = payload?.sub
   return typeof sub === 'string' && sub ? sub : undefined
+}
+
+export function getAuthedAccountType(): number {
+  const auth = getStoredAuth()
+  if (!auth?.token) return ACCOUNT_TYPE.EMPLOYEE
+
+  // 优先从存储的 auth 对象获取
+  if (auth.account_type !== undefined) {
+    return auth.account_type
+  }
+
+  // 从 JWT payload 获取
+  const payload = getJwtPayload(auth.token)
+  const accountType = payload?.account_type
+  return typeof accountType === 'number' ? accountType : ACCOUNT_TYPE.EMPLOYEE
+}
+
+export function isAdmin(): boolean {
+  return getAuthedAccountType() === ACCOUNT_TYPE.ADMIN
 }
 
 export function normalizeRedirectPath(input?: string): string | undefined {

@@ -9,7 +9,7 @@ import ReportsTable from './_components/ReportsTable'
 import ReportsList from './_components/ReportsList'
 import ReportsSummary from './_components/ReportsSummary'
 import { BackArrow } from '@/components/icons'
-import { useStaffs } from '@/modules/staffs/useStaffs'
+import { useStaffsForReports } from '@/modules/staffs/useStaffs'
 import { getRecentWeekPeriodOptions } from '@/lib/reportPeriods'
 import { EVAL_TYPE, type EvalType } from '@/constants'
 import { EVAL_TYPE_NAMES } from './_components/util'
@@ -36,11 +36,11 @@ function RouteComponent() {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(100)
 
-  const { staffs, isLoading: isStaffsLoading } = useStaffs()
+  const { staffs, isLoading: isStaffsLoading } = useStaffsForReports()
   const staffName = useMemo(() => {
     if (!effectiveEmployeeId) return undefined
-    return staffs?.content?.find(s => s.id === effectiveEmployeeId)?.name ?? effectiveEmployeeId
-  }, [effectiveEmployeeId, staffs?.content])
+    return staffs?.find(s => s.id === effectiveEmployeeId)?.name ?? effectiveEmployeeId
+  }, [effectiveEmployeeId, staffs])
 
   const periodOptions = useMemo(() => getRecentWeekPeriodOptions(8), [])
 
@@ -129,7 +129,7 @@ function RouteComponent() {
             }}
           >
             <option value="">全部员工</option>
-            {staffs?.content?.map((s) => (
+            {staffs?.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
               </option>

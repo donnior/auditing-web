@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { getStaffs, createStaff, updateStaff, deleteStaff, assignAccount, removeAccount, getAvailableAccounts } from './api'
+import { getStaffs, createStaff, updateStaff, deleteStaff, assignAccount, removeAccount, getAvailableAccounts, getManagedByLeader } from './api'
 import type { Staff, CreateStaffData, UpdateStaffData } from '@/modules/staffs/api'
+import { isAdmin, getAuthedUsername } from '@/lib/auth'
 
 // 获取员工列表
 export const useStaffs = () => {
@@ -95,4 +96,55 @@ export const useAvailableAccounts = () => {
   })
 
   return { accounts, isLoading, error, refetch }
+}
+
+// 获取组长管理的员工列表
+export const useManagedByLeader = (username: string | undefined) => {
+  const { data: staffs, isLoading, error, refetch } = useQuery({
+    queryKey: ['managed-by-leader', username],
+    queryFn: () => getManagedByLeader(username!),
+    enabled: !!username,
+  })
+
+  return { staffs, isLoading, error, refetch }
+}
+
+/**
+ * 根据账户类型获取员工列表
+ * - 管理员：获取所有员工
+ * - 普通员工（组长）：获取其管理的分组内的员工
+ */
+export const useStaffsForReports = () => {
+  const admin = isAdmin()
+  const username = getAuthedUsername()
+
+  // 管理员获取所有员工
+  const allStaffsQuery = useQuery({
+    queryKey: ['staffs'],
+    queryFn: getStaffs,
+    enabled: admin,
+  })
+
+  // 组长获取管理的员工
+  const managedStaffsQuery = useQuery({
+    queryKey: ['managed-by-leader', username],
+    queryFn: () => getManagedByLeader(username!),
+    enabled: !admin && !!username,
+  })
+
+  if (admin) {
+    return {
+      staffs: allStaffsQuery.data?.content || [],
+      isLoading: allStaffsQuery.isLoading,
+      error: allStaffsQuery.error,
+      refetch: allStaffsQuery.refetch,
+    }
+  } else {
+    return {
+      staffs: managedStaffsQuery.data || [],
+      isLoading: managedStaffsQuery.isLoading,
+      error: managedStaffsQuery.error,
+      refetch: managedStaffsQuery.refetch,
+    }
+  }
 }

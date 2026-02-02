@@ -50,6 +50,16 @@ export const getAvailableAccounts = async (): Promise<AccountBrief[]> => {
   return response.data
 }
 
+/**
+ * 获取组长管理的员工列表
+ */
+export const getManagedByLeader = async (username: string): Promise<Staff[]> => {
+  const response = await axios.get('/auditing-api/employees/managed-by-leader', {
+    params: { username }
+  })
+  return response.data
+}
+
 // 账户简要信息
 export interface AccountBrief {
   id: string
