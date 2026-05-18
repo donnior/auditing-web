@@ -94,6 +94,9 @@ function getCardUser(item: EvaluationDetail): CardUser | undefined {
 }
 
 function getCampTag(item: EvaluationDetail) {
+  if (item.camp_tag) {
+    return normalizeCampTag(item.camp_tag)
+  }
   const cardUser = getCardUser(item)
   return normalizeCampTag(cardUser?.camp_tag || cardUser?.campTag)
 }

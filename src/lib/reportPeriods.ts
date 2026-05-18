@@ -20,14 +20,15 @@ function toCompactYmd(ymd: string): string {
 
 /**
  * 生成“当前往前 N 周”的统计周期下拉选项。
- * - 默认按“周日”作为周期结束日（与常见周报口径一致）
+ * - 默认按“周六”作为业务周期结束日
  * - 每个周期长度为 7 天：start = end - 6 天
  */
 export function getRecentWeekPeriodOptions(weeks = 8, now = new Date()): WeekPeriodOption[] {
-  const dayOfWeek = now.getDay() // 0: Sunday
+  const dayOfWeek = now.getDay() // 0: Sunday, 6: Saturday
+  const daysSinceSaturday = (dayOfWeek + 1) % 7
   const latestEnd = new Date(now)
   latestEnd.setHours(0, 0, 0, 0)
-  latestEnd.setDate(latestEnd.getDate() - dayOfWeek)
+  latestEnd.setDate(latestEnd.getDate() - daysSinceSaturday)
 
   const out: WeekPeriodOption[] = []
   for (let i = 0; i < weeks; i++) {

@@ -149,6 +149,7 @@ export interface EvaluationDetail {
   chat_start_time: string
   chat_end_time: string
   biz_date: string
+  camp_tag?: string
   risk_words: string
 }
 
