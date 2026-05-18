@@ -29,7 +29,7 @@ const AdminLayout = () => {
                 <Link to="/admin/groups" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
                   分组
                 </Link>
-                <Link to="/admin/reports" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+                <Link to="/admin/period-reports" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
                   报告
                 </Link>
                 <Link to="/admin/accounts" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">

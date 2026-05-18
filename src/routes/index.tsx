@@ -10,7 +10,7 @@ export default function RouteComponent() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    navigate({ to: '/admin/reports', replace: true })
+    navigate({ to: '/admin/period-reports', replace: true })
   }, [])
 
   return null;

@@ -19,6 +19,7 @@ import { Route as AdminSlowPageRouteImport } from './routes/admin/slow-page'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AdminStaffsIndexRouteImport } from './routes/admin/staffs/index'
 import { Route as AdminReportsIndexRouteImport } from './routes/admin/reports/index'
+import { Route as AdminPeriodReportsIndexRouteImport } from './routes/admin/period-reports/index'
 import { Route as AdminGroupsIndexRouteImport } from './routes/admin/groups/index'
 import { Route as AdminAccountsIndexRouteImport } from './routes/admin/accounts/index'
 import { Route as UserProjectsIndexRouteImport } from './routes/_user/projects/index'
@@ -27,6 +28,7 @@ import { Route as AdminGroupsIdRouteImport } from './routes/admin/groups/$id'
 import { Route as AdminChatSessionIdRouteImport } from './routes/admin/chat/$sessionId'
 import { Route as UserProjectsList2RouteImport } from './routes/_user/projects/list2'
 import { Route as UserProjectsIdRouteImport } from './routes/_user/projects/$id'
+import { Route as AdminPeriodReportsEmployeeIdEvalPeriodRouteImport } from './routes/admin/period-reports/$employeeId/$evalPeriod'
 import { Route as UserProjectsIdMembersRouteImport } from './routes/_user/projects_/$id/members'
 
 const AboutRoute = AboutRouteImport.update({
@@ -77,6 +79,11 @@ const AdminReportsIndexRoute = AdminReportsIndexRouteImport.update({
   path: '/reports/',
   getParentRoute: () => AdminLayoutRoute,
 } as any)
+const AdminPeriodReportsIndexRoute = AdminPeriodReportsIndexRouteImport.update({
+  id: '/period-reports/',
+  path: '/period-reports/',
+  getParentRoute: () => AdminLayoutRoute,
+} as any)
 const AdminGroupsIndexRoute = AdminGroupsIndexRouteImport.update({
   id: '/groups/',
   path: '/groups/',
@@ -117,6 +124,12 @@ const UserProjectsIdRoute = UserProjectsIdRouteImport.update({
   path: '/projects/$id',
   getParentRoute: () => UserLayoutRoute,
 } as any)
+const AdminPeriodReportsEmployeeIdEvalPeriodRoute =
+  AdminPeriodReportsEmployeeIdEvalPeriodRouteImport.update({
+    id: '/period-reports/$employeeId/$evalPeriod',
+    path: '/period-reports/$employeeId/$evalPeriod',
+    getParentRoute: () => AdminLayoutRoute,
+  } as any)
 const UserProjectsIdMembersRoute = UserProjectsIdMembersRouteImport.update({
   id: '/projects_/$id/members',
   path: '/projects/$id/members',
@@ -138,9 +151,11 @@ export interface FileRoutesByFullPath {
   '/projects': typeof UserProjectsIndexRoute
   '/admin/accounts': typeof AdminAccountsIndexRoute
   '/admin/groups': typeof AdminGroupsIndexRoute
+  '/admin/period-reports': typeof AdminPeriodReportsIndexRoute
   '/admin/reports': typeof AdminReportsIndexRoute
   '/admin/staffs': typeof AdminStaffsIndexRoute
   '/projects/$id/members': typeof UserProjectsIdMembersRoute
+  '/admin/period-reports/$employeeId/$evalPeriod': typeof AdminPeriodReportsEmployeeIdEvalPeriodRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -156,9 +171,11 @@ export interface FileRoutesByTo {
   '/projects': typeof UserProjectsIndexRoute
   '/admin/accounts': typeof AdminAccountsIndexRoute
   '/admin/groups': typeof AdminGroupsIndexRoute
+  '/admin/period-reports': typeof AdminPeriodReportsIndexRoute
   '/admin/reports': typeof AdminReportsIndexRoute
   '/admin/staffs': typeof AdminStaffsIndexRoute
   '/projects/$id/members': typeof UserProjectsIdMembersRoute
+  '/admin/period-reports/$employeeId/$evalPeriod': typeof AdminPeriodReportsEmployeeIdEvalPeriodRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -178,9 +195,11 @@ export interface FileRoutesById {
   '/_user/projects/': typeof UserProjectsIndexRoute
   '/admin/accounts/': typeof AdminAccountsIndexRoute
   '/admin/groups/': typeof AdminGroupsIndexRoute
+  '/admin/period-reports/': typeof AdminPeriodReportsIndexRoute
   '/admin/reports/': typeof AdminReportsIndexRoute
   '/admin/staffs/': typeof AdminStaffsIndexRoute
   '/_user/projects_/$id/members': typeof UserProjectsIdMembersRoute
+  '/admin/period-reports/$employeeId/$evalPeriod': typeof AdminPeriodReportsEmployeeIdEvalPeriodRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -199,9 +218,11 @@ export interface FileRouteTypes {
     | '/projects'
     | '/admin/accounts'
     | '/admin/groups'
+    | '/admin/period-reports'
     | '/admin/reports'
     | '/admin/staffs'
     | '/projects/$id/members'
+    | '/admin/period-reports/$employeeId/$evalPeriod'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -217,9 +238,11 @@ export interface FileRouteTypes {
     | '/projects'
     | '/admin/accounts'
     | '/admin/groups'
+    | '/admin/period-reports'
     | '/admin/reports'
     | '/admin/staffs'
     | '/projects/$id/members'
+    | '/admin/period-reports/$employeeId/$evalPeriod'
   id:
     | '__root__'
     | '/'
@@ -238,9 +261,11 @@ export interface FileRouteTypes {
     | '/_user/projects/'
     | '/admin/accounts/'
     | '/admin/groups/'
+    | '/admin/period-reports/'
     | '/admin/reports/'
     | '/admin/staffs/'
     | '/_user/projects_/$id/members'
+    | '/admin/period-reports/$employeeId/$evalPeriod'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -323,6 +348,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminReportsIndexRouteImport
       parentRoute: typeof AdminLayoutRoute
     }
+    '/admin/period-reports/': {
+      id: '/admin/period-reports/'
+      path: '/period-reports'
+      fullPath: '/admin/period-reports'
+      preLoaderRoute: typeof AdminPeriodReportsIndexRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
     '/admin/groups/': {
       id: '/admin/groups/'
       path: '/groups'
@@ -379,6 +411,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserProjectsIdRouteImport
       parentRoute: typeof UserLayoutRoute
     }
+    '/admin/period-reports/$employeeId/$evalPeriod': {
+      id: '/admin/period-reports/$employeeId/$evalPeriod'
+      path: '/period-reports/$employeeId/$evalPeriod'
+      fullPath: '/admin/period-reports/$employeeId/$evalPeriod'
+      preLoaderRoute: typeof AdminPeriodReportsEmployeeIdEvalPeriodRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
     '/_user/projects_/$id/members': {
       id: '/_user/projects_/$id/members'
       path: '/projects/$id/members'
@@ -427,8 +466,10 @@ interface AdminLayoutRouteChildren {
   AdminReportsIdRoute: typeof AdminReportsIdRoute
   AdminAccountsIndexRoute: typeof AdminAccountsIndexRoute
   AdminGroupsIndexRoute: typeof AdminGroupsIndexRoute
+  AdminPeriodReportsIndexRoute: typeof AdminPeriodReportsIndexRoute
   AdminReportsIndexRoute: typeof AdminReportsIndexRoute
   AdminStaffsIndexRoute: typeof AdminStaffsIndexRoute
+  AdminPeriodReportsEmployeeIdEvalPeriodRoute: typeof AdminPeriodReportsEmployeeIdEvalPeriodRoute
 }
 
 const AdminLayoutRouteChildren: AdminLayoutRouteChildren = {
@@ -439,8 +480,11 @@ const AdminLayoutRouteChildren: AdminLayoutRouteChildren = {
   AdminReportsIdRoute: AdminReportsIdRoute,
   AdminAccountsIndexRoute: AdminAccountsIndexRoute,
   AdminGroupsIndexRoute: AdminGroupsIndexRoute,
+  AdminPeriodReportsIndexRoute: AdminPeriodReportsIndexRoute,
   AdminReportsIndexRoute: AdminReportsIndexRoute,
   AdminStaffsIndexRoute: AdminStaffsIndexRoute,
+  AdminPeriodReportsEmployeeIdEvalPeriodRoute:
+    AdminPeriodReportsEmployeeIdEvalPeriodRoute,
 }
 
 const AdminLayoutRouteWithChildren = AdminLayoutRoute._addFileChildren(

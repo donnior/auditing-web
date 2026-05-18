@@ -6,11 +6,11 @@ export const getWeeklyReportSummaryById = async (id: string): Promise<WeeklyRepo
   return response.data
 }
 
-export const getReports = async (staffName?: string, employeeId?: string, evalPeriod?: string, evalType?: string): Promise<PageResponse<WeeklyReportSummary>> => {
+export const getReports = async (staffName?: string, employeeId?: string, evalPeriod?: string, evalType?: string, pageSize = 100): Promise<PageResponse<WeeklyReportSummary>> => {
   const response = await axios.get('/auditing-api/weekly-report-summaries', {
     params: {
       staffName: staffName || '',
-      page_size: 100,
+      page_size: pageSize,
       employeeId: employeeId || '',
       evalPeriod: evalPeriod || '',
       evalType: evalType || ''
@@ -19,11 +19,11 @@ export const getReports = async (staffName?: string, employeeId?: string, evalPe
   return response.data
 }
 
-export const getWeeklyReportSummaryDetails = async (id: string, metric: string): Promise<PageResponse<EvaluationDetail>> => {
+export const getWeeklyReportSummaryDetails = async (id: string, metric: string, pageSize = 200): Promise<PageResponse<EvaluationDetail>> => {
   const response = await axios.get(`/auditing-api/weekly-report-summaries/${id}/details`, {
     params: {
       metric,
-      page_size: 200
+      page_size: pageSize
     }
   })
   return response.data

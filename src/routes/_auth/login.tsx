@@ -47,7 +47,7 @@ function RouteComponent() {
         expires_at: Date.now() + token.expires_in * 1000,
       })
 
-      const redirectTo = normalizeRedirectPath(search.redirect) ?? '/admin/reports'
+      const redirectTo = normalizeRedirectPath(search.redirect) ?? '/admin/period-reports'
       navigate({ to: redirectTo, replace: true })
     } catch (err: any) {
       setErrorMsg(err?.message || '登录失败，请稍后重试')
