@@ -29,6 +29,21 @@ export const getWeeklyReportSummaryDetails = async (id: string, metric: string, 
   return response.data
 }
 
+export const getCampCustomerDailyPerformanceSummary = async (
+  sysUserId: string,
+  startDate: string,
+  endDate: string
+): Promise<CampCustomerDailyPerformanceSummary[]> => {
+  const response = await axios.get('/auditing-api/camp-customer-daily-performance/summary', {
+    params: {
+      sysUserId,
+      startDate,
+      endDate
+    }
+  })
+  return response.data
+}
+
 // 聊天记录相关
 export interface ChatMessage {
   msg_id: string
@@ -101,6 +116,13 @@ export interface WeeklyReportSummary {
   total_week_material_send: number
   total_sunday_link_send: number
   total_risk_word_trigger: number
+}
+
+export interface CampCustomerDailyPerformanceSummary {
+  camp_tag: string
+  gmv_amount: number
+  refund_amount: number
+  record_count: number
 }
 
 export interface EvaluationDetail {

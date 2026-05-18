@@ -6,8 +6,10 @@ import { BackArrow } from '@/components/icons'
 import { EVAL_TYPE, type EvalType } from '@/constants'
 import { daysBefore } from '@/lib/utils'
 import {
+  type CampCustomerDailyPerformanceSummary,
   type EvaluationDetail,
   type WeeklyReportSummary,
+  getCampCustomerDailyPerformanceSummary,
   getReports,
   getWeeklyReportSummaryDetails
 } from '@/modules/reports/api'
@@ -46,6 +48,8 @@ type CampStageRow = {
   newCount?: number
   riskCount: number
   serviceCompleteCount: number
+  gmvAmount: number
+  refundAmount: number
 }
 
 type PeriodTotals = {
@@ -91,7 +95,7 @@ function getCardUser(item: EvaluationDetail): CardUser | undefined {
 
 function getCampTag(item: EvaluationDetail) {
   const cardUser = getCardUser(item)
-  return cardUser?.camp_tag || cardUser?.campTag || '未标记'
+  return normalizeCampTag(cardUser?.camp_tag || cardUser?.campTag)
 }
 
 function getCustomerName(item: EvaluationDetail) {
@@ -121,6 +125,23 @@ function getDelta(current: number, previous?: number) {
 function getDeltaClass(current: number, previous?: number) {
   if (previous === undefined || current === previous) return 'text-gray-500'
   return current > previous ? 'text-blue-700' : 'text-orange-600'
+}
+
+function normalizeCampTag(campTag?: string) {
+  return campTag || '未标记'
+}
+
+function toAmount(value?: number) {
+  return typeof value === 'number' && Number.isFinite(value) ? value : 0
+}
+
+function formatMoney(value: number) {
+  return new Intl.NumberFormat('zh-CN', {
+    style: 'currency',
+    currency: 'CNY',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value)
 }
 
 function groupByCampTag(items: EvaluationDetail[]) {
@@ -160,7 +181,18 @@ async function fetchBundles(summaries: WeeklyReportSummary[]): Promise<StageBund
   )
 }
 
-function buildCampRows(currentBundles: StageBundle[], previousBundles: StageBundle[]) {
+function buildPerformanceMap(items: CampCustomerDailyPerformanceSummary[]) {
+  return items.reduce((acc, item) => {
+    acc.set(normalizeCampTag(item.camp_tag), item)
+    return acc
+  }, new Map<string, CampCustomerDailyPerformanceSummary>())
+}
+
+function buildCampRows(
+  currentBundles: StageBundle[],
+  previousBundles: StageBundle[],
+  performanceByCampTag: Map<string, CampCustomerDailyPerformanceSummary>
+) {
   const previousByStage = new Map(previousBundles.map((bundle) => [bundle.summary.eval_type as EvalType, bundle]))
 
   return currentBundles.flatMap((bundle): CampStageRow[] => {
@@ -173,6 +205,7 @@ function buildCampRows(currentBundles: StageBundle[], previousBundles: StageBund
     const currentGroups = groupByCampTag(bundle.items)
 
     if (currentGroups.size === 0) {
+      const performance = performanceByCampTag.get('未标记')
       return [{
         key: `${bundle.summary.id}__empty`,
         campTag: '未标记',
@@ -181,11 +214,14 @@ function buildCampRows(currentBundles: StageBundle[], previousBundles: StageBund
         currentCount: bundle.summary.total_customers || 0,
         riskCount: bundle.summary.total_risk_word_trigger || 0,
         serviceCompleteCount: 0,
+        gmvAmount: toAmount(performance?.gmv_amount),
+        refundAmount: toAmount(performance?.refund_amount),
       }]
     }
 
     return Array.from(currentGroups.entries()).map(([campTag, currentItems]) => {
       const previousItems = previousGroups.get(campTag) ?? []
+      const performance = performanceByCampTag.get(campTag)
       const currentIds = new Set(currentItems.map((item) => item.customer_id))
       const previousIds = new Set(previousItems.map((item) => item.customer_id))
       const carryoverCount = currentItems.filter((item) => previousIds.has(item.customer_id)).length
@@ -204,6 +240,8 @@ function buildCampRows(currentBundles: StageBundle[], previousBundles: StageBund
         newCount: previousEvalType ? newCount : undefined,
         riskCount: currentItems.filter((item) => item.has_risk_word_trigger === 1).length,
         serviceCompleteCount: getServiceCompleteCount(currentItems),
+        gmvAmount: toAmount(performance?.gmv_amount),
+        refundAmount: toAmount(performance?.refund_amount),
       }
     })
   })
@@ -271,13 +309,23 @@ function RouteComponent() {
 
   const currentTotals = useMemo(() => getTotals(currentReports), [currentReports])
   const previousTotals = useMemo(() => previousReports.length > 0 ? getTotals(previousReports) : undefined, [previousReports])
+  const employeeQwId = currentReports[0]?.employee_qw_id || previousReports[0]?.employee_qw_id || ''
+  const performanceQuery = useQuery({
+    queryKey: ['campCustomerDailyPerformanceSummary', employeeQwId, evalPeriod],
+    queryFn: () => getCampCustomerDailyPerformanceSummary(employeeQwId, daysBefore(evalPeriod, 6), evalPeriod),
+    enabled: Boolean(employeeQwId),
+  })
+  const performanceByCampTag = useMemo(
+    () => buildPerformanceMap(performanceQuery.data ?? []),
+    [performanceQuery.data]
+  )
   const rows = useMemo(
-    () => buildCampRows(currentBundlesQuery.data ?? [], previousBundlesQuery.data ?? []),
-    [currentBundlesQuery.data, previousBundlesQuery.data]
+    () => buildCampRows(currentBundlesQuery.data ?? [], previousBundlesQuery.data ?? [], performanceByCampTag),
+    [currentBundlesQuery.data, previousBundlesQuery.data, performanceByCampTag]
   )
   const employeeName = currentReports[0]?.employee_name || previousReports[0]?.employee_name || employeeId
-  const isLoading = currentReportsQuery.isLoading || previousReportsQuery.isLoading || currentBundlesQuery.isLoading || previousBundlesQuery.isLoading
-  const isError = currentReportsQuery.isError || previousReportsQuery.isError || currentBundlesQuery.isError || previousBundlesQuery.isError
+  const isLoading = currentReportsQuery.isLoading || previousReportsQuery.isLoading || currentBundlesQuery.isLoading || previousBundlesQuery.isLoading || performanceQuery.isLoading
+  const isError = currentReportsQuery.isError || previousReportsQuery.isError || currentBundlesQuery.isError || previousBundlesQuery.isError || performanceQuery.isError
 
   return (
     <div className="space-y-6">
@@ -361,6 +409,8 @@ function RouteComponent() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500">承接</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500">流失</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500">新增/补入</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500">GMV收入</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500">退款</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500">服务全完成</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500">风险触发</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500">操作</th>
@@ -380,6 +430,8 @@ function RouteComponent() {
                       <td className="whitespace-nowrap px-6 py-4 text-sm text-blue-700">{row.carryoverCount ?? '-'}</td>
                       <td className="whitespace-nowrap px-6 py-4 text-sm text-red-700">{row.churnedCount ?? '-'}</td>
                       <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{row.newCount ?? '-'}</td>
+                      <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{formatMoney(row.gmvAmount)}</td>
+                      <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-red-700">{formatMoney(row.refundAmount)}</td>
                       <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
                         {row.serviceCompleteCount}/{row.currentCount}
                       </td>
