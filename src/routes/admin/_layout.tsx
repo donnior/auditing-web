@@ -32,6 +32,9 @@ const AdminLayout = () => {
                 <Link to="/admin/period-reports" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
                   报告
                 </Link>
+                <Link to="/admin/rankings" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+                  排行榜
+                </Link>
                 <Link to="/admin/accounts" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
                   账号
                 </Link>

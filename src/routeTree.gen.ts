@@ -19,6 +19,7 @@ import { Route as AdminSlowPageRouteImport } from './routes/admin/slow-page'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AdminStaffsIndexRouteImport } from './routes/admin/staffs/index'
 import { Route as AdminReportsIndexRouteImport } from './routes/admin/reports/index'
+import { Route as AdminRankingsIndexRouteImport } from './routes/admin/rankings/index'
 import { Route as AdminPeriodReportsIndexRouteImport } from './routes/admin/period-reports/index'
 import { Route as AdminGroupsIndexRouteImport } from './routes/admin/groups/index'
 import { Route as AdminAccountsIndexRouteImport } from './routes/admin/accounts/index'
@@ -77,6 +78,11 @@ const AdminStaffsIndexRoute = AdminStaffsIndexRouteImport.update({
 const AdminReportsIndexRoute = AdminReportsIndexRouteImport.update({
   id: '/reports/',
   path: '/reports/',
+  getParentRoute: () => AdminLayoutRoute,
+} as any)
+const AdminRankingsIndexRoute = AdminRankingsIndexRouteImport.update({
+  id: '/rankings/',
+  path: '/rankings/',
   getParentRoute: () => AdminLayoutRoute,
 } as any)
 const AdminPeriodReportsIndexRoute = AdminPeriodReportsIndexRouteImport.update({
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/admin/accounts': typeof AdminAccountsIndexRoute
   '/admin/groups': typeof AdminGroupsIndexRoute
   '/admin/period-reports': typeof AdminPeriodReportsIndexRoute
+  '/admin/rankings': typeof AdminRankingsIndexRoute
   '/admin/reports': typeof AdminReportsIndexRoute
   '/admin/staffs': typeof AdminStaffsIndexRoute
   '/projects/$id/members': typeof UserProjectsIdMembersRoute
@@ -172,6 +179,7 @@ export interface FileRoutesByTo {
   '/admin/accounts': typeof AdminAccountsIndexRoute
   '/admin/groups': typeof AdminGroupsIndexRoute
   '/admin/period-reports': typeof AdminPeriodReportsIndexRoute
+  '/admin/rankings': typeof AdminRankingsIndexRoute
   '/admin/reports': typeof AdminReportsIndexRoute
   '/admin/staffs': typeof AdminStaffsIndexRoute
   '/projects/$id/members': typeof UserProjectsIdMembersRoute
@@ -196,6 +204,7 @@ export interface FileRoutesById {
   '/admin/accounts/': typeof AdminAccountsIndexRoute
   '/admin/groups/': typeof AdminGroupsIndexRoute
   '/admin/period-reports/': typeof AdminPeriodReportsIndexRoute
+  '/admin/rankings/': typeof AdminRankingsIndexRoute
   '/admin/reports/': typeof AdminReportsIndexRoute
   '/admin/staffs/': typeof AdminStaffsIndexRoute
   '/_user/projects_/$id/members': typeof UserProjectsIdMembersRoute
@@ -219,6 +228,7 @@ export interface FileRouteTypes {
     | '/admin/accounts'
     | '/admin/groups'
     | '/admin/period-reports'
+    | '/admin/rankings'
     | '/admin/reports'
     | '/admin/staffs'
     | '/projects/$id/members'
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/admin/accounts'
     | '/admin/groups'
     | '/admin/period-reports'
+    | '/admin/rankings'
     | '/admin/reports'
     | '/admin/staffs'
     | '/projects/$id/members'
@@ -262,6 +273,7 @@ export interface FileRouteTypes {
     | '/admin/accounts/'
     | '/admin/groups/'
     | '/admin/period-reports/'
+    | '/admin/rankings/'
     | '/admin/reports/'
     | '/admin/staffs/'
     | '/_user/projects_/$id/members'
@@ -346,6 +358,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/admin/reports'
       preLoaderRoute: typeof AdminReportsIndexRouteImport
+      parentRoute: typeof AdminLayoutRoute
+    }
+    '/admin/rankings/': {
+      id: '/admin/rankings/'
+      path: '/rankings'
+      fullPath: '/admin/rankings'
+      preLoaderRoute: typeof AdminRankingsIndexRouteImport
       parentRoute: typeof AdminLayoutRoute
     }
     '/admin/period-reports/': {
@@ -467,6 +486,7 @@ interface AdminLayoutRouteChildren {
   AdminAccountsIndexRoute: typeof AdminAccountsIndexRoute
   AdminGroupsIndexRoute: typeof AdminGroupsIndexRoute
   AdminPeriodReportsIndexRoute: typeof AdminPeriodReportsIndexRoute
+  AdminRankingsIndexRoute: typeof AdminRankingsIndexRoute
   AdminReportsIndexRoute: typeof AdminReportsIndexRoute
   AdminStaffsIndexRoute: typeof AdminStaffsIndexRoute
   AdminPeriodReportsEmployeeIdEvalPeriodRoute: typeof AdminPeriodReportsEmployeeIdEvalPeriodRoute
@@ -481,6 +501,7 @@ const AdminLayoutRouteChildren: AdminLayoutRouteChildren = {
   AdminAccountsIndexRoute: AdminAccountsIndexRoute,
   AdminGroupsIndexRoute: AdminGroupsIndexRoute,
   AdminPeriodReportsIndexRoute: AdminPeriodReportsIndexRoute,
+  AdminRankingsIndexRoute: AdminRankingsIndexRoute,
   AdminReportsIndexRoute: AdminReportsIndexRoute,
   AdminStaffsIndexRoute: AdminStaffsIndexRoute,
   AdminPeriodReportsEmployeeIdEvalPeriodRoute:
