@@ -3,6 +3,8 @@ import { getStaffs, createStaff, updateStaff, deleteStaff, assignAccount, remove
 import type { Staff, CreateStaffData, UpdateStaffData } from '@/modules/staffs/api'
 import { isAdmin, getAuthedUsername } from '@/lib/auth'
 
+const REPORT_STAFFS_PAGE_SIZE = 100
+
 // 获取员工列表
 export const useStaffs = (page = 1, pageSize = 10) => {
   const { data: staffs, isLoading, error, refetch } = useQuery({
@@ -120,8 +122,8 @@ export const useStaffsForReports = () => {
 
   // 管理员获取所有员工
   const allStaffsQuery = useQuery({
-    queryKey: ['staffs'],
-    queryFn: getStaffs,
+    queryKey: ['report-staffs', REPORT_STAFFS_PAGE_SIZE],
+    queryFn: () => getStaffs(1, REPORT_STAFFS_PAGE_SIZE),
     enabled: admin,
   })
 
