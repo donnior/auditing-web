@@ -10,7 +10,9 @@ export const Route = createFileRoute('/admin/staffs/')({
 })
 
 function RouteComponent() {
-  const { staffs, isLoading, refetch } = useStaffs()
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 10
+  const { staffs, isLoading, refetch } = useStaffs(currentPage, pageSize)
   const { createStaffMutation, isCreating } = useCreateStaff()
   const { updateStaffMutation, isUpdating } = useUpdateStaff()
   const { deleteStaffMutation, isDeleting } = useDeleteStaff()
@@ -78,6 +80,11 @@ function RouteComponent() {
     setAssigningStaff(null)
   }
 
+  const totalEmployees = staffs?.total_elements ?? 0
+  const totalPages = Math.ceil(totalEmployees / pageSize)
+  const pageStart = totalEmployees === 0 ? 0 : (currentPage - 1) * pageSize + 1
+  const pageEnd = Math.min(currentPage * pageSize, totalEmployees)
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -119,9 +126,6 @@ function RouteComponent() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 登录账户
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                自动生成报告
-              </th>
               {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 创建时间
               </th> */}
@@ -133,7 +137,7 @@ function RouteComponent() {
           <tbody className="bg-white divide-y divide-gray-200">
             {staffs?.content?.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
                   暂无员工数据
                 </td>
               </tr>
@@ -203,15 +207,6 @@ function RouteComponent() {
                       </button>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      staff.status
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {staff.status === 1 ? '是' : '否'}
-                    </span>
-                  </td>
                   {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {new Date(staff.create_time).toLocaleDateString('zh-CN')}
                   </td> */}
@@ -249,8 +244,30 @@ function RouteComponent() {
       {/* 统计信息 */}
       <div className="flex items-center justify-between mt-6">
         <div className="text-sm text-gray-700">
-          共 <span className="font-medium">{staffs?.items?.length}</span> 名员工
+          显示 <span className="font-medium">{pageStart}</span> 到 <span className="font-medium">{pageEnd}</span> 名，
+          共 <span className="font-medium">{totalEmployees}</span> 名员工
         </div>
+        {totalPages > 1 && (
+          <div className="flex items-center gap-2">
+            <button
+              className="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={currentPage <= 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+            >
+              上一页
+            </button>
+            <span className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md">
+              {currentPage}
+            </span>
+            <button
+              className="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={currentPage >= totalPages}
+              onClick={() => setCurrentPage(currentPage + 1)}
+            >
+              下一页
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 员工 Modal */}

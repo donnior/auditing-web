@@ -4,10 +4,10 @@ import type { Staff, CreateStaffData, UpdateStaffData } from '@/modules/staffs/a
 import { isAdmin, getAuthedUsername } from '@/lib/auth'
 
 // 获取员工列表
-export const useStaffs = () => {
+export const useStaffs = (page = 1, pageSize = 10) => {
   const { data: staffs, isLoading, error, refetch } = useQuery({
-    queryKey: ['staffs'],
-    queryFn: getStaffs,
+    queryKey: ['staffs', page, pageSize],
+    queryFn: () => getStaffs(page, pageSize),
   })
 
   return { staffs, isLoading, error, refetch }

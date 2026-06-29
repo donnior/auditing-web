@@ -7,8 +7,13 @@ import type { PageResponse } from '../common/types'
 // export { getStaffs, createStaff, updateStaff, deleteStaff }
 
 
-export const getStaffs = async (): Promise<PageResponse<Staff>> => {
-  const response = await axios.get('/auditing-api/employees')
+export const getStaffs = async (page = 1, pageSize = 10): Promise<PageResponse<Staff>> => {
+  const response = await axios.get('/auditing-api/employees', {
+    params: {
+      page,
+      page_size: pageSize,
+    },
+  })
   return response.data
 }
 
