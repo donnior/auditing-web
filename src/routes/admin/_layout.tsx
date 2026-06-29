@@ -1,9 +1,20 @@
 import { Link, Outlet, createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
-import { clearStoredAuth, getAuthedUsername, isAuthed } from '../../lib/auth';
+import { clearStoredAuth, getAuthedUsername, isAdmin, isAuthed } from '../../lib/auth';
+
+const navItems = [
+  { to: '/admin/staffs', label: '员工', adminOnly: true },
+  { to: '/admin/groups', label: '分组', adminOnly: true },
+  { to: '/admin/period-reports', label: '报告', adminOnly: false },
+  { to: '/admin/rankings', label: '排行榜', adminOnly: false },
+  { to: '/admin/accounts', label: '账号', adminOnly: true },
+] as const
 
 const AdminLayout = () => {
   const navigate = useNavigate()
   const username = getAuthedUsername()
+  const admin = isAdmin()
+  const homeRoute = admin ? '/admin/staffs' : '/admin/period-reports'
+  const visibleNavItems = navItems.filter((item) => admin || !item.adminOnly)
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -11,7 +22,7 @@ const AdminLayout = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between sm:h-16 sm:py-0">
             {/* 小屏：第一行仅 logo+系统名；sm+：与下方同一行 */}
-            <Link to="/admin/staffs" className="flex items-center">
+            <Link to={homeRoute} className="flex items-center">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-2">
                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -23,21 +34,11 @@ const AdminLayout = () => {
             {/* 小屏：第二行左导航右用户；sm+：与 logo 同行 */}
             <div className="flex items-center justify-between sm:flex-1 sm:ml-8">
               <nav className="flex items-center gap-4 sm:gap-6 md:gap-8">
-                <Link to="/admin/staffs" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
-                  员工
-                </Link>
-                <Link to="/admin/groups" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
-                  分组
-                </Link>
-                <Link to="/admin/period-reports" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
-                  报告
-                </Link>
-                <Link to="/admin/rankings" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
-                  排行榜
-                </Link>
-                <Link to="/admin/accounts" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
-                  账号
-                </Link>
+                {visibleNavItems.map((item) => (
+                  <Link key={item.to} to={item.to} className="text-gray-600 hover:text-blue-600 font-medium transition-colors">
+                    {item.label}
+                  </Link>
+                ))}
               </nav>
 
               <div className="flex items-center gap-2">

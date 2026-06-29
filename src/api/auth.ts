@@ -9,6 +9,7 @@ export type LoginToken = {
   expires_in: number
   token: string
   token_type: string
+  account_type?: number
 }
 
 export type LoginResponse = {

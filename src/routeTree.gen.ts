@@ -154,13 +154,13 @@ export interface FileRoutesByFullPath {
   '/admin/chat/$sessionId': typeof AdminChatSessionIdRoute
   '/admin/groups/$id': typeof AdminGroupsIdRoute
   '/admin/reports/$id': typeof AdminReportsIdRoute
-  '/projects': typeof UserProjectsIndexRoute
-  '/admin/accounts': typeof AdminAccountsIndexRoute
-  '/admin/groups': typeof AdminGroupsIndexRoute
-  '/admin/period-reports': typeof AdminPeriodReportsIndexRoute
-  '/admin/rankings': typeof AdminRankingsIndexRoute
-  '/admin/reports': typeof AdminReportsIndexRoute
-  '/admin/staffs': typeof AdminStaffsIndexRoute
+  '/projects/': typeof UserProjectsIndexRoute
+  '/admin/accounts/': typeof AdminAccountsIndexRoute
+  '/admin/groups/': typeof AdminGroupsIndexRoute
+  '/admin/period-reports/': typeof AdminPeriodReportsIndexRoute
+  '/admin/rankings/': typeof AdminRankingsIndexRoute
+  '/admin/reports/': typeof AdminReportsIndexRoute
+  '/admin/staffs/': typeof AdminStaffsIndexRoute
   '/projects/$id/members': typeof UserProjectsIdMembersRoute
   '/admin/period-reports/$employeeId/$evalPeriod': typeof AdminPeriodReportsEmployeeIdEvalPeriodRoute
 }
@@ -224,13 +224,13 @@ export interface FileRouteTypes {
     | '/admin/chat/$sessionId'
     | '/admin/groups/$id'
     | '/admin/reports/$id'
-    | '/projects'
-    | '/admin/accounts'
-    | '/admin/groups'
-    | '/admin/period-reports'
-    | '/admin/rankings'
-    | '/admin/reports'
-    | '/admin/staffs'
+    | '/projects/'
+    | '/admin/accounts/'
+    | '/admin/groups/'
+    | '/admin/period-reports/'
+    | '/admin/rankings/'
+    | '/admin/reports/'
+    | '/admin/staffs/'
     | '/projects/$id/members'
     | '/admin/period-reports/$employeeId/$evalPeriod'
   fileRoutesByTo: FileRoutesByTo
@@ -307,14 +307,14 @@ declare module '@tanstack/react-router' {
     '/_user': {
       id: '/_user'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof UserLayoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_auth': {
       id: '/_auth'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof AuthLayoutRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -349,49 +349,49 @@ declare module '@tanstack/react-router' {
     '/admin/staffs/': {
       id: '/admin/staffs/'
       path: '/staffs'
-      fullPath: '/admin/staffs'
+      fullPath: '/admin/staffs/'
       preLoaderRoute: typeof AdminStaffsIndexRouteImport
       parentRoute: typeof AdminLayoutRoute
     }
     '/admin/reports/': {
       id: '/admin/reports/'
       path: '/reports'
-      fullPath: '/admin/reports'
+      fullPath: '/admin/reports/'
       preLoaderRoute: typeof AdminReportsIndexRouteImport
       parentRoute: typeof AdminLayoutRoute
     }
     '/admin/rankings/': {
       id: '/admin/rankings/'
       path: '/rankings'
-      fullPath: '/admin/rankings'
+      fullPath: '/admin/rankings/'
       preLoaderRoute: typeof AdminRankingsIndexRouteImport
       parentRoute: typeof AdminLayoutRoute
     }
     '/admin/period-reports/': {
       id: '/admin/period-reports/'
       path: '/period-reports'
-      fullPath: '/admin/period-reports'
+      fullPath: '/admin/period-reports/'
       preLoaderRoute: typeof AdminPeriodReportsIndexRouteImport
       parentRoute: typeof AdminLayoutRoute
     }
     '/admin/groups/': {
       id: '/admin/groups/'
       path: '/groups'
-      fullPath: '/admin/groups'
+      fullPath: '/admin/groups/'
       preLoaderRoute: typeof AdminGroupsIndexRouteImport
       parentRoute: typeof AdminLayoutRoute
     }
     '/admin/accounts/': {
       id: '/admin/accounts/'
       path: '/accounts'
-      fullPath: '/admin/accounts'
+      fullPath: '/admin/accounts/'
       preLoaderRoute: typeof AdminAccountsIndexRouteImport
       parentRoute: typeof AdminLayoutRoute
     }
     '/_user/projects/': {
       id: '/_user/projects/'
       path: '/projects'
-      fullPath: '/projects'
+      fullPath: '/projects/'
       preLoaderRoute: typeof UserProjectsIndexRouteImport
       parentRoute: typeof UserLayoutRoute
     }
